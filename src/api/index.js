@@ -6,8 +6,8 @@ const getQuizFrontend = (title) => {
   return axios
     .get(`http://localhost:8080/quiz/search?title=${title}&state=發布中`)
     .then((res) => {
-      console.log(res.data);
       const data = res.data.quizs;
+      console.log(data);
       return data;
     })
     .catch((e) => {
@@ -21,8 +21,8 @@ const getQuizBackend = (title, state) => {
   return axios
     .get(`http://localhost:8080/quiz/search?title=${title}&state=${state}`)
     .then((res) => {
-      console.log(res);
       const data = res.data.quizs;
+      console.log(data);
       return data;
     })
     .catch((e) => {
@@ -45,7 +45,7 @@ const deleteQuiz = (id) => {
   return axios
     .post(`http://localhost:8080/quiz/delete?id=${id}`)
     .then((res) => {
-      console.log(res.data.rtnCode);
+      console.log("刪除問卷訊息" + res.data.rtnCode);
     })
     .catch((e) => {
       console.log(e);

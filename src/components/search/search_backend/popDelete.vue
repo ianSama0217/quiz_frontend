@@ -1,37 +1,27 @@
 <script setup>
+import { defineProps } from "vue";
 /* api */
 import api from "../../../api/index.js";
 /* pinia */
 import { useDisplayStore } from "../../../stores/popStore.js";
 
 const displayStore = useDisplayStore();
-const { isDisplayDelete } = displayStore;
+const { closeDeletePop } = displayStore;
 
-const { deleteQuiz } = api;
-
-const props = defineProps(["title", "id"]);
-
-const clearQuiz = (id) => {
-  deleteQuiz(id)
-    .then()
-    .catch((e) => {
-      console.log(e);
-      throw e;
-    });
-};
+const props = defineProps(["clearQuiz", "id"]);
 </script>
 
 <template>
   <div class="popBackground"></div>
 
   <div class="pop">
-    <i class="fa-solid fa-xmark icon"></i>
-    <p>確定要刪除{{ title }}嗎?</p>
+    <i class="fa-solid fa-xmark icon" @click="closeDeletePop"></i>
+    <p>確定要刪除嗎?</p>
     <p class="hint">刪除後無法復原</p>
 
     <div class="buttonBar">
-      <button type="button">取消</button>
-      <button type="button" @click="clearQuiz(3)">確認刪除</button>
+      <button type="button" @click="closeDeletePop">取消</button>
+      <button type="button" @click="clearQuiz(id)">確認刪除</button>
     </div>
   </div>
 </template>

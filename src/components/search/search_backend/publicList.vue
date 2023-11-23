@@ -1,11 +1,12 @@
 <script setup>
-/*pinia*/
-import { useDisplayStore } from "../../../stores/popStore.js";
-
-const displayStore = useDisplayStore();
-const { isDisplayDelete } = displayStore;
+import { defineProps, defineEmits } from "vue";
 
 const props = defineProps(["getValue"]);
+const emits = defineEmits(["deleteQuizItem"]);
+
+const emitDeleteQuiz = (id) => {
+  emits("deleteQuizItem", id);
+};
 </script>
 
 <template>
@@ -19,7 +20,7 @@ const props = defineProps(["getValue"]);
         <i class="fa-regular fa-pen-to-square icon"></i>
       </RouterLink>
 
-      <button @click="isDisplayDelete" type="button" title="刪除問卷">
+      <button @click="emitDeleteQuiz(data.id)" type="button" title="刪除問卷">
         <i class="fa-regular fa-trash-can icon"></i>
       </button>
     </div>
@@ -47,7 +48,7 @@ const props = defineProps(["getValue"]);
         <i class="fa-solid fa-chart-column icon"></i>
       </RouterLink>
 
-      <button @click="isDisplayDelete" type="button" title="刪除問卷">
+      <button @click="emitDeleteQuiz(data.id)" type="button" title="刪除問卷">
         <i class="fa-regular fa-trash-can icon"></i>
       </button>
     </div>

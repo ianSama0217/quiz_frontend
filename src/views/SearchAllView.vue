@@ -11,14 +11,20 @@ import popDelete from "../components/search/search_backend/popDelete.vue";
 import { useDisplayStore } from "../stores/popStore.js";
 
 const displayStore = useDisplayStore();
+const { openDeletePop, closeDeletePop } = displayStore;
 const { isPopDelete } = storeToRefs(displayStore);
 
-const { getQuizBackend, getQuizInfo } = api;
+const { getQuizBackend, getQuizInfo, deleteQuiz } = api;
 
+/* 搜尋欄位 */
 const inputTitle = ref("");
 const inputState = ref("");
 
+/*接收API資料*/
 const getQuizValues = ref([]);
+
+/*儲存指定問卷id*/
+const quizId = ref(0);
 
 const search = (inputTitle, inputState) => {
   getQuizBackend(inputTitle, inputState)
@@ -31,6 +37,28 @@ const search = (inputTitle, inputState) => {
     });
 };
 
+/* 使用publicList emits取得指定id*/
+const handleDeleteQuiz = (id) => {
+  quizId.value = id;
+  //顯示彈跳視窗
+  openDeletePop();
+};
+
+/*利用list emits傳入的指定id刪除指定問卷*/
+const clearQuiz = () => {
+  deleteQuiz(quizId.value)
+    .then(() => {
+      //刪除成功後，刷新問卷資料
+      search(inputTitle.value, inputState.value);
+    })
+    .catch((e) => {
+      console.log(e);
+      throw e;
+    });
+  //關閉彈跳視窗
+  closeDeletePop();
+};
+
 /*載入頁面前先執行一次search，顯示全部資料*/
 onBeforeMount(() => {
   search("", "");
@@ -38,6 +66,8 @@ onBeforeMount(() => {
 </script>
 
 <template>
+  {{ quizId }}
+  {{ isPopDelete }}
   <div class="body">
     <!-- 搜尋區域 -->
     <div class="searchBar">
@@ -63,7 +93,10 @@ onBeforeMount(() => {
 
     <!-- 顯示搜尋問卷列表 -->
     <div class="publicList">
-      <publicList :getValue="getQuizValues" />
+      <publicList
+        :getValue="getQuizValues"
+        @deleteQuizItem="handleDeleteQuiz"
+      />
     </div>
     <!-- 顯示搜尋問卷列表 -->
 
@@ -75,7 +108,7 @@ onBeforeMount(() => {
 
     <!-- 彈跳視窗 -->
     <div class="popDelete" v-if="isPopDelete">
-      <popDelete />
+      <popDelete :clearQuiz="clearQuiz" :id="quizId" />
     </div>
     <!-- 彈跳視窗 -->
 

@@ -1,9 +1,17 @@
 <script setup>
-import { ref, onBeforeMount, watch } from "vue";
+import { ref, onBeforeMount } from "vue";
+import { storeToRefs } from "pinia";
+/* api*/
 import api from "../api/index.js";
 /* 匯入組件 */
 import publicList from "../components/search/search_backend/publicList.vue";
 import changePageBtn from "../components/search/changePageBtn.vue";
+import popDelete from "../components/search/search_backend/popDelete.vue";
+/* pinia */
+import { useDisplayStore } from "../stores/popStore.js";
+
+const displayStore = useDisplayStore();
+const { isPopDelete } = storeToRefs(displayStore);
 
 const { getQuizBackend, getQuizInfo } = api;
 
@@ -64,6 +72,12 @@ onBeforeMount(() => {
       <changePageBtn />
     </div>
     <!-- 切換頁面 -->
+
+    <!-- 彈跳視窗 -->
+    <div class="popDelete" v-if="isPopDelete">
+      <popDelete />
+    </div>
+    <!-- 彈跳視窗 -->
 
     <!-- 測試區域 -->
     <!-- <h5>getQuizValues:{{ getQuizValues }}</h5>

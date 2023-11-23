@@ -40,15 +40,12 @@ const getQuizInfo = (id) => {
 };
 
 /*post*/
-//刪除問卷
+//刪除問卷(包含對應quizId的問題及選項)
 const deleteQuiz = (id) => {
   return axios
     .post(`http://localhost:8080/quiz/delete?id=${id}`)
     .then((res) => {
-      console.log(res);
-      const data = res.data.quizs.title;
-      console.log(data);
-      return data;
+      console.log(res.data.rtnCode);
     })
     .catch((e) => {
       console.log(e);
@@ -56,7 +53,7 @@ const deleteQuiz = (id) => {
     });
 };
 
-//
+//刪除問題(包含對應qId的選項)
 const deleteQestion = (qId) => {
   return axios
     .post(`http://localhost:8080/question/delete?qId=${qId}`)
@@ -71,7 +68,7 @@ const deleteQestion = (qId) => {
     });
 };
 
-//
+//刪除選項
 const deleteSelection = (seleId) => {
   return axios
     .post(`http://localhost:8080/selection/delete?seleId=${seleId}`)

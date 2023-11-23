@@ -1,4 +1,10 @@
 <script setup>
+/*pinia*/
+import { useDisplayStore } from "../../../stores/popStore.js";
+
+const displayStore = useDisplayStore();
+const { isDisplayDelete } = displayStore;
+
 const props = defineProps(["getValue"]);
 </script>
 
@@ -13,7 +19,7 @@ const props = defineProps(["getValue"]);
         <i class="fa-regular fa-pen-to-square icon"></i>
       </RouterLink>
 
-      <button type="button" title="刪除問卷">
+      <button @click="isDisplayDelete" type="button" title="刪除問卷">
         <i class="fa-regular fa-trash-can icon"></i>
       </button>
     </div>
@@ -41,7 +47,7 @@ const props = defineProps(["getValue"]);
         <i class="fa-solid fa-chart-column icon"></i>
       </RouterLink>
 
-      <button type="button" title="刪除問卷">
+      <button @click="isDisplayDelete" type="button" title="刪除問卷">
         <i class="fa-regular fa-trash-can icon"></i>
       </button>
     </div>

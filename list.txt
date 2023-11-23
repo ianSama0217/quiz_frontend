@@ -1,0 +1,12 @@
+ColorStyle
+$backgroundColor: #def5e5;
+$lightColor: #bcead5;
+$darkColor: #9ed5c5;
+$themeColor: #8ec3b0;
+$textColor: #1e5128;
+
+文字大小
+icon:通常 1.5rem
+title:1.6~2rem
+副標題，元件標題:1.2~1.4rem
+content:1rem

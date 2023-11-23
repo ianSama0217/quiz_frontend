@@ -20,8 +20,15 @@ const getQuizFrontend = (title) => {
 const getQuizBackend = (title, state) => {
   return axios
     .get(`http://localhost:8080/quiz/search?title=${title}&state=${state}`)
-    .then((res) => console.log(res))
-    .catch((e) => console.log(e));
+    .then((res) => {
+      console.log(res);
+      const data = res.data.quizs;
+      return data;
+    })
+    .catch((e) => {
+      console.log(e);
+      throw e;
+    });
 };
 
 //取得問卷細項資訊
@@ -33,5 +40,57 @@ const getQuizInfo = (id) => {
 };
 
 /*post*/
+//刪除問卷
+const deleteQuiz = (id) => {
+  return axios
+    .post(`http://localhost:8080/quiz/delete?id=${id}`)
+    .then((res) => {
+      console.log(res);
+      const data = res.data.quizs.title;
+      console.log(data);
+      return data;
+    })
+    .catch((e) => {
+      console.log(e);
+      throw e;
+    });
+};
 
-export default { getQuizFrontend, getQuizBackend, getQuizInfo };
+//
+const deleteQestion = (qId) => {
+  return axios
+    .post(`http://localhost:8080/question/delete?qId=${qId}`)
+    .then((res) => {
+      console.log(res);
+      const data = res.data.quizs;
+      return data;
+    })
+    .catch((e) => {
+      console.log(e);
+      throw e;
+    });
+};
+
+//
+const deleteSelection = (seleId) => {
+  return axios
+    .post(`http://localhost:8080/selection/delete?seleId=${seleId}`)
+    .then((res) => {
+      console.log(res);
+      const data = res.data.quizs;
+      return data;
+    })
+    .catch((e) => {
+      console.log(e);
+      throw e;
+    });
+};
+
+export default {
+  getQuizFrontend,
+  getQuizBackend,
+  getQuizInfo,
+  deleteQuiz,
+  deleteQestion,
+  deleteSelection,
+};

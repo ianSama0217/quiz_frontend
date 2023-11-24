@@ -10,3 +10,21 @@ icon:通常 1.5rem
 title:1.6~2rem
 副標題，元件標題:1.2~1.4rem
 content:1rem
+
+11/23
+search 顯示問卷列表完成
+delete 刪除問卷完成
+
+☆ 刪除時會取得指定問卷的id進行操作(填寫、觀看、編輯也可用同樣方法找到問卷)
+
+11/24
+create 創建位完成問卷(沒有start_time和end_time)
+
+☆ 在create頁面中建立一個req的物件，裡面裝著create API所需的JSON資料。
+問題使用v-for創建及刪除，問題底下的選項也是用v-for創建及刪除。
+要注意兩個v-for不能使用同樣的index當成變數，系統會只抓到問題的index導致資料操作發生錯誤。
+另外在新增問題的內的選項時，不能使用ref變數push到questions內(會導致所有資料同步更新)，
+push進到questions的資料直接在方法內寫即可。
+☆☆☆在JS中要給API的JSON，key值一定要先確認和API要求的相符，不然修改很麻煩☆☆☆
+
+明天先防呆 + 設定post按鈕 + createView CSS樣式至作

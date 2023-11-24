@@ -66,8 +66,6 @@ onBeforeMount(() => {
 </script>
 
 <template>
-  {{ quizId }}
-  {{ isPopDelete }}
   <div class="body">
     <!-- 搜尋區域 -->
     <div class="searchBar">

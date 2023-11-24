@@ -40,6 +40,22 @@ const getQuizInfo = (id) => {
 };
 
 /*post*/
+//新增問卷
+const createQuiz = (req) => {
+  return axios({
+    method: "post",
+    url: `http://localhost:8080/quiz/create`,
+    data: req,
+  })
+    .then((res) => {
+      console.log("新增問卷訊息" + res.data.rtnCode);
+    })
+    .catch((e) => {
+      console.log(e);
+      throw e;
+    });
+};
+
 //刪除問卷(包含對應quizId的問題及選項)
 const deleteQuiz = (id) => {
   return axios
@@ -68,26 +84,11 @@ const deleteQestion = (qId) => {
     });
 };
 
-//刪除選項
-const deleteSelection = (seleId) => {
-  return axios
-    .post(`http://localhost:8080/selection/delete?seleId=${seleId}`)
-    .then((res) => {
-      console.log(res);
-      const data = res.data.quizs;
-      return data;
-    })
-    .catch((e) => {
-      console.log(e);
-      throw e;
-    });
-};
-
 export default {
   getQuizFrontend,
   getQuizBackend,
   getQuizInfo,
+  createQuiz,
   deleteQuiz,
   deleteQestion,
-  deleteSelection,
 };

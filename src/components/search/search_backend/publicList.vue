@@ -12,7 +12,7 @@ const emitDeleteQuiz = (id) => {
 <template>
   <div class="resList" v-for="data in getValue">
     <span class="title">{{ data.title }}</span>
-    <span class="time">{{ data.state }}</span>
+    <span class="state">{{ data.state }}</span>
 
     <!-- 尚未開始顯示的icon -->
     <div class="iconBar" v-show="data.state === '尚未開始'">
@@ -69,17 +69,17 @@ const emitDeleteQuiz = (id) => {
   box-shadow: 0px 8px 6px -6px #1e5128;
 
   .title {
-    width: 30%;
-    font-size: 1.2rem;
-  }
-
-  .time {
     width: 40%;
     font-size: 1.2rem;
   }
 
-  .iconBar {
+  .state {
     width: 20%;
+    font-size: 1.2rem;
+  }
+
+  .iconBar {
+    width: 30%;
     display: flex;
     justify-content: space-around;
     .icon {

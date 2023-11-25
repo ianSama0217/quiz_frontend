@@ -52,6 +52,8 @@ const emitEndDate = (event) => {
 }
 .pop {
   background-color: #8ec3b0;
+  display: flex;
+  flex-direction: column;
   padding: 2rem;
   border-radius: 8px;
   position: fixed;
@@ -78,6 +80,12 @@ const emitEndDate = (event) => {
     font-size: 1.2rem;
     color: #1e5128;
     text-align: center;
+    margin: 0.2rem 0;
+  }
+
+  input {
+    font-size: 1.2rem;
+    color: #1e5128;
   }
 
   .buttonBar {

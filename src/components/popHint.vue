@@ -33,6 +33,9 @@ const props = defineProps(["hintStr"]);
 }
 .pop {
   background-color: #8ec3b0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   padding: 2rem;
   border-radius: 8px;
   position: fixed;
@@ -55,13 +58,9 @@ const props = defineProps(["hintStr"]);
     }
   }
 
-  //   p {
-  //     font-size: 1.2rem;
-  //     color: #1e5128;
-  //     text-align: center;
-  //   }
-
   .hint {
+    margin-bottom: 1rem;
+    text-align: center;
     font-size: 1.2rem;
     color: red;
   }

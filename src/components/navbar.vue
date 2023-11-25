@@ -42,11 +42,11 @@ $textColor: #1e5128;
     display: flex;
     .fa-layer-group {
       font-size: 2rem;
-      animation: logoColor 1s ease 0s infinite alternate forwards;
+      animation: logoColor 2s ease 0s infinite alternate forwards;
     }
     .webName {
       font-size: 2rem;
-      animation: logoColor 1s ease 0s infinite alternate forwards;
+      animation: logoColor 2s ease 0s infinite alternate forwards;
     }
   }
 

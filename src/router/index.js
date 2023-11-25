@@ -23,6 +23,11 @@ const router = createRouter({
       name: "search_backend",
       component: () => import("../views/SearchAllView.vue"),
     },
+    {
+      path: "/:domain(.*)*",
+      name: "error",
+      component: () => import("../views/ErrorView.vue"),
+    },
   ],
 });
 

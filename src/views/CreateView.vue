@@ -355,7 +355,7 @@ const postQuiz = () => {
               class="textarea"
               v-if="CreateReq.question[index].selection_type == 'textarea'"
             >
-              <textarea disabled="false"></textarea>
+              <textarea disabled="false" placeholder="作答區域"></textarea>
             </div>
             <!-- 文字方塊   -->
           </div>
@@ -456,8 +456,10 @@ button {
     }
 
     textarea {
-      width: 100%;
+      max-width: 100%;
+      min-width: 50%;
       min-height: 25vh;
+      max-height: 30vh;
       border: none;
       outline: none;
       border-radius: 8px;
@@ -607,6 +609,8 @@ button {
           textarea {
             min-width: 30vw;
             min-height: 20vh;
+            max-height: 25vh;
+            font-size: 1.1rem;
             border-radius: 12px;
             background-color: #def5e5;
             color: #1e5128;

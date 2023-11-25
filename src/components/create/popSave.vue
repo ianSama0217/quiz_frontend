@@ -1,10 +1,17 @@
 <script setup>
-import { RouterLink } from "vue-router";
+import { useRouter } from "vue-router";
 /* pinia */
 import { useDisplayStore } from "../../stores/popStore.js";
 
+const router = useRouter();
+
 const displayStore = useDisplayStore();
 const { closeSavePop } = displayStore;
+
+const turnTosearch = () => {
+  closeSavePop();
+  router.push("/search_backend");
+};
 </script>
 
 <template>
@@ -14,9 +21,7 @@ const { closeSavePop } = displayStore;
     <p>問卷儲存成功</p>
     <p>請至歷史紀錄查看</p>
 
-    <button type="button" @click="closeSavePop">
-      <RouterLink to="/search_backend">確認</RouterLink>
-    </button>
+    <button type="button" @click="turnTosearch">確認</button>
   </div>
 </template>
 
@@ -35,6 +40,9 @@ const { closeSavePop } = displayStore;
   background-color: #8ec3b0;
   padding: 2rem;
   border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   position: fixed;
   top: 50%;
   left: 50%;
@@ -56,7 +64,7 @@ const { closeSavePop } = displayStore;
     border: 1px solid #1e5128;
     border-radius: 8px;
     padding: 0.2rem;
-    margin: 0 1rem;
+    margin-top: 1rem;
     transition: 0.3s ease;
 
     &:hover {

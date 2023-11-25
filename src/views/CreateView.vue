@@ -1,5 +1,6 @@
 <script setup>
-import { reactive, ref } from "vue";
+import { reactive } from "vue";
+import { useRouter } from "vue-router";
 import { storeToRefs } from "pinia";
 /* api */
 import api from "../api/index.js";
@@ -9,6 +10,8 @@ import popPost from "../components/create/popPost.vue";
 import popHint from "../components/popHint.vue";
 /* pinia */
 import { useDisplayStore } from "../stores/popStore.js";
+
+const router = useRouter();
 
 const displayStore = useDisplayStore();
 const { openSavePop, openHintPop, openPostPop, closePostPop } = displayStore;
@@ -225,121 +228,149 @@ const postQuiz = () => {
     createQuiz(CreateReq);
     //關閉popPost
     closePostPop();
+    //跳轉至HomeView
+    router.push("/search_backend");
   }
 };
 </script>
 
 <template>
   <!-- 測試資料 -->
-  <h3>{{ CreateReq }}</h3>
+  <!-- <h3>{{ CreateReq }}</h3> -->
   <!-- 測試資料 -->
+  <div class="body">
+    <div class="questionTitle">
+      <label for="">標題</label>
+      <input
+        v-model.trim="CreateReq.quiz.title"
+        type="text"
+        placeholder="輸入問卷名稱"
+      />
+    </div>
 
-  <label for="">標題</label>
-  <input
-    v-model.trim="CreateReq.quiz.title"
-    type="text"
-    placeholder="輸入問卷名稱"
-  />
-  <label for="">問卷說明</label>
-  <input
-    v-model.trim="CreateReq.quiz.description"
-    type="text"
-    placeholder="輸入問卷名稱"
-  />
+    <div class="quizDesp">
+      <label for="">問卷說明</label>
+      <textarea
+        v-model.trim="CreateReq.quiz.description"
+        type="text"
+        placeholder="輸入問卷說明(200字以內)"
+      ></textarea>
+    </div>
 
-  <div class="questionArea">
-    <!-- 單個問題區塊  -->
-    <div
-      class="questionBox"
-      v-for="(item, index) in CreateReq.question"
-      :key="index"
-    >
-      <!-- 設定問題內容   -->
-      <div class="setQuestion">
-        <button type="button" @click="deleteQuestions">
-          <i class="fa-solid fa-xmark"></i>
-        </button>
-        <label for="">問題名稱</label>
-        <input
-          v-model.trim="CreateReq.question[index].q_name"
-          type="text"
-          placeholder="輸入問題名稱"
-        />
-        <label for="">問題類型</label>
-        <select
-          v-model="CreateReq.question[index].selection_type"
-          @change="clearSelections(index)"
-        >
-          <option value="radio">單選</option>
-          <option value="checkbox">複選</option>
-          <option value="textarea">文字方塊</option>
-        </select>
-        <!-- 設定選項內容  -->
-        <div class="setSelection">
-          <!-- 單選區域   -->
-          <div
-            class="radio"
-            v-if="CreateReq.question[index].selection_type == 'radio'"
-          >
-            <div
-              v-for="(item, seleindex) in CreateReq.question[index].selection"
-              :key="seleindex"
-            >
-              <input type="radio" disabled="false" />
+    <div class="questionArea">
+      <!-- 單個問題區塊  -->
+      <div
+        class="questionBox"
+        v-for="(item, index) in CreateReq.question"
+        :key="index"
+      >
+        <!-- 設定問題內容   -->
+        <div class="setQuestion">
+          <i
+            @click="deleteQuestions(index)"
+            class="fa-solid fa-xmark xicon"
+          ></i>
+
+          <div class="setQues">
+            <div class="setQName">
+              <label for="">問題名稱</label>
               <input
-                v-model.trim="CreateReq.question[index].selection[seleindex]"
+                v-model.trim="CreateReq.question[index].q_name"
                 type="text"
-                placeholder="輸入選項內容"
+                placeholder="輸入問題名稱"
               />
-              <button type="button" @click="deleteSelections(index, seleindex)">
-                刪除這個radio
+            </div>
+
+            <div class="setQType">
+              <label for="">問題類型</label>
+              <select
+                v-model="CreateReq.question[index].selection_type"
+                @change="clearSelections(index)"
+              >
+                <option value="radio">單選</option>
+                <option value="checkbox">複選</option>
+                <option value="textarea">文字方塊</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- 設定選項內容  -->
+          <div class="setSelection">
+            <!-- 單選區域   -->
+            <div
+              class="radio"
+              v-if="CreateReq.question[index].selection_type == 'radio'"
+            >
+              <div
+                class="singleRadio"
+                v-for="(item, seleindex) in CreateReq.question[index].selection"
+                :key="seleindex"
+              >
+                <input type="radio" disabled="false" />
+                <input
+                  v-model.trim="CreateReq.question[index].selection[seleindex]"
+                  type="text"
+                  placeholder="輸入選項內容"
+                />
+                <i
+                  @click="deleteSelections(index, seleindex)"
+                  class="fa-regular fa-trash-can trashIcon"
+                ></i>
+              </div>
+              <button type="button" @click="addSelections(index)">
+                新增選項
               </button>
             </div>
-            <button type="button" @click="addSelections(index)">單選+1</button>
-          </div>
-          <!-- 單選區域   -->
+            <!-- 單選區域   -->
 
-          <!-- 複選區域   -->
-          <div
-            class="checkbox"
-            v-if="CreateReq.question[index].selection_type == 'checkbox'"
-          >
+            <!-- 複選區域   -->
             <div
-              v-for="(item, seleindex) in CreateReq.question[index].selection"
-              :key="seleindex"
+              class="checkbox"
+              v-if="CreateReq.question[index].selection_type == 'checkbox'"
             >
-              <input type="checkbox" disabled="false" />
-              <input
-                v-model.trim="CreateReq.question[index].selection[seleindex]"
-                type="text"
-                placeholder="輸入選項內容"
-              />
-              <button type="button" @click="deleteSelections(index, seleindex)">
-                刪除這個checkbox
+              <div
+                class="singleCheckbox"
+                v-for="(item, seleindex) in CreateReq.question[index].selection"
+                :key="seleindex"
+              >
+                <input type="checkbox" disabled="false" />
+                <input
+                  v-model.trim="CreateReq.question[index].selection[seleindex]"
+                  type="text"
+                  placeholder="輸入選項內容"
+                />
+                <i
+                  @click="deleteSelections(index, seleindex)"
+                  class="fa-regular fa-trash-can trashIcon"
+                ></i>
+              </div>
+              <button type="button" @click="addSelections(index)">
+                新增選項
               </button>
             </div>
-            <button type="button" @click="addSelections(index)">複選+1</button>
-          </div>
-          <!-- 複選區域   -->
+            <!-- 複選區域   -->
 
-          <!-- 文字方塊   -->
-          <div
-            class="textarea"
-            v-if="CreateReq.question[index].selection_type == 'textarea'"
-          >
-            <textarea disabled="false"></textarea>
+            <!-- 文字方塊   -->
+            <div
+              class="textarea"
+              v-if="CreateReq.question[index].selection_type == 'textarea'"
+            >
+              <textarea disabled="false"></textarea>
+            </div>
+            <!-- 文字方塊   -->
           </div>
-          <!-- 文字方塊   -->
+          <!-- 設定選項內容  -->
         </div>
-        <!-- 設定選項內容  -->
+        <!-- 設定問題內容   -->
       </div>
-      <!-- 設定問題內容   -->
+    </div>
+
+    <button type="button" @click="addQuestions">新增問題</button>
+    <div class="apiBtn">
+      <button type="button" @click="saveQuiz(index)">儲存問卷</button>
+      <button type="button" @click="clickPostBtn()">立即發布</button>
     </div>
   </div>
-
-  <button type="button" @click="addQuestions">問題+1</button>
-  <button type="button" @click="saveQuiz(index)">儲存</button>
-  <button type="button" @click="clickPostBtn()">立即發布</button>
 
   <!-- 儲存彈跳視窗  -->
   <div class="popSave" v-if="isPopSave">
@@ -365,7 +396,234 @@ const postQuiz = () => {
 </template>
 
 <style scoped lang="scss">
-.questionBox {
-  border: 1px solid red;
+button {
+  align-self: center;
+  font-size: 1.2rem;
+  background-color: #bcead5;
+  color: #1e5128;
+  border-radius: 8px;
+  border: 1px solid #1e5128;
+  padding: 0.2rem 0.4rem;
+  transition: 0.3s ease;
+  &:hover {
+    cursor: pointer;
+    background-color: #1e5128;
+    color: #bcead5;
+  }
+}
+
+.body {
+  min-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  .questionTitle {
+    margin-top: 1rem;
+
+    label {
+      font-size: 1.5rem;
+      color: #1e5128;
+      margin-right: 0.5rem;
+    }
+
+    input {
+      border: none;
+      outline: none;
+      border-bottom: 1px solid #1e5128;
+      height: 2rem;
+      font-size: 1.3rem;
+      padding: 0.2rem;
+    }
+  }
+
+  .quizDesp {
+    width: 50vw;
+    border-radius: 12px;
+    background-color: #8ec3b0;
+    color: #1e5128;
+    padding: 0.5rem 1rem 1rem 1rem;
+    margin: 0.8rem 0;
+    box-shadow: 0px 5px 6px -6px #1e5128;
+    display: flex;
+    flex-direction: column;
+
+    label {
+      align-self: center;
+      font-size: 1.4rem;
+      color: #1e5128;
+      margin: 0.5rem 0;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 25vh;
+      border: none;
+      outline: none;
+      border-radius: 8px;
+      background-color: #def5e5;
+      height: 2rem;
+      font-size: 1.2rem;
+      padding: 0.2rem;
+    }
+  }
+
+  .questionArea {
+    display: flex;
+    flex-direction: column;
+
+    .questionBox {
+      width: 50vw;
+      border-radius: 12px;
+      background-color: #8ec3b0;
+      color: #1e5128;
+      padding: 2rem 1rem 1rem 1rem;
+      margin: 0.8rem 0;
+      box-shadow: 0px 5px 6px -6px #1e5128;
+      position: relative;
+
+      .xicon {
+        font-size: 1.4rem;
+        position: absolute;
+        top: 3%;
+        right: 1%;
+        transition: 0.5s ease;
+        padding: 0.3rem;
+        border-radius: 8px;
+
+        &:hover {
+          cursor: pointer;
+          outline: 1px solid #1e5128;
+        }
+      }
+
+      .setQues {
+        display: flex;
+        justify-content: space-around;
+        margin-bottom: 0.5rem;
+
+        .setQName {
+          label {
+            font-size: 1.2rem;
+            margin-right: 0.5rem;
+          }
+
+          input {
+            border: none;
+            outline: none;
+            background-color: #8ec3b0;
+            border-bottom: 1px solid #1e5128;
+            height: 1.5rem;
+            font-size: 1.2rem;
+            padding: 0.2rem;
+          }
+        }
+
+        .setQType {
+          label {
+            font-size: 1.2rem;
+            margin-right: 0.5rem;
+          }
+
+          select {
+            padding: 0.2rem;
+            font-size: 1rem;
+          }
+        }
+      }
+
+      .setSelection {
+        .radio {
+          display: flex;
+          flex-direction: column;
+
+          .singleRadio {
+            margin: 0.5rem 0;
+            display: flex;
+            align-items: center;
+
+            input[type="radio"] {
+              margin-right: 0.5rem;
+              transform: scale(1.5);
+            }
+
+            input[type="text"] {
+              width: 50%;
+              border: none;
+              outline: none;
+              height: 1.5rem;
+              padding: 0.2rem;
+              font-size: 1.2rem;
+            }
+            .trashIcon {
+              font-size: 1.3rem;
+              color: #1e5128;
+              margin-left: 0.5rem;
+
+              &:hover {
+                cursor: pointer;
+              }
+            }
+          }
+        }
+
+        .checkbox {
+          display: flex;
+          flex-direction: column;
+          .singleCheckbox {
+            margin: 0.5rem 0;
+            display: flex;
+            align-items: center;
+
+            input[type="checkbox"] {
+              margin-right: 0.5rem;
+              transform: scale(1.5);
+            }
+
+            input[type="text"] {
+              width: 50%;
+              border: none;
+              outline: none;
+              height: 1.5rem;
+              padding: 0.2rem;
+              font-size: 1.2rem;
+            }
+            .trashIcon {
+              font-size: 1.3rem;
+              color: #1e5128;
+              margin-left: 0.5rem;
+
+              &:hover {
+                cursor: pointer;
+              }
+            }
+          }
+        }
+
+        .textarea {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          textarea {
+            min-width: 30vw;
+            min-height: 20vh;
+            border-radius: 12px;
+            background-color: #def5e5;
+            color: #1e5128;
+            padding: 0.5rem;
+            margin: 0.5rem 0;
+            box-shadow: 0px 5px 6px -6px #1e5128;
+          }
+        }
+      }
+    }
+  }
+  .apiBtn {
+    margin: 2rem 0 1rem 0;
+    button {
+      margin: 0 2rem;
+      transform: scale(1.2);
+    }
+  }
 }
 </style>

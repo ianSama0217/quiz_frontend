@@ -1,27 +1,40 @@
 <script setup>
 import { defineProps } from "vue";
+import { RouterLink } from "vue-router";
 /* api */
-import api from "../../../api/index.js";
+import api from "../../api/index.js";
 /* pinia */
-import { useDisplayStore } from "../../../stores/popStore.js";
+import { useDisplayStore } from "../../stores/popStore.js";
 
 const displayStore = useDisplayStore();
-const { closeDeletePop } = displayStore;
+const { closePostPop } = displayStore;
 
-const props = defineProps(["clearQuiz", "id"]);
+const props = defineProps(["postQuiz"]);
+const emits = defineEmits(["startDate", "endDate"]);
+
+const emitStartDate = (event) => {
+  const startDate = event.target.value;
+  emits("startDate", startDate);
+};
+
+const emitEndDate = (event) => {
+  const endDate = event.target.value;
+  emits("endDate", endDate);
+};
 </script>
 
 <template>
   <div class="popBackground"></div>
 
   <div class="pop">
-    <i class="fa-solid fa-xmark icon" @click="closeDeletePop"></i>
-    <p>確定要刪除嗎?</p>
-    <p class="hint">刪除後無法復原</p>
-
+    <i class="fa-solid fa-xmark icon" @click="closePostPop"></i>
+    <label>選擇發布日期</label>
+    <input type="date" @input="emitStartDate" />
+    <label>選擇結束日期</label>
+    <input type="date" @input="emitEndDate" />
     <div class="buttonBar">
-      <button type="button" @click="closeDeletePop">取消</button>
-      <button type="button" @click="clearQuiz(id)">確認刪除</button>
+      <button type="button" @click="closePostPop">取消</button>
+      <button type="button" @click="postQuiz">發布</button>
     </div>
   </div>
 </template>
@@ -61,15 +74,10 @@ const props = defineProps(["clearQuiz", "id"]);
     }
   }
 
-  p {
+  label {
     font-size: 1.2rem;
     color: #1e5128;
     text-align: center;
-  }
-
-  .hint {
-    font-size: 1.2rem;
-    color: red;
   }
 
   .buttonBar {

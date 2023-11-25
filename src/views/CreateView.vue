@@ -5,12 +5,14 @@ import { storeToRefs } from "pinia";
 import api from "../api/index.js";
 /* 匯入組件 */
 import popSave from "../components/create/popSave.vue";
+import popPost from "../components/create/popPost.vue";
+import popHint from "../components/popHint.vue";
 /* pinia */
 import { useDisplayStore } from "../stores/popStore.js";
 
 const displayStore = useDisplayStore();
-const { openSavePop } = displayStore;
-const { isPopSave } = storeToRefs(displayStore);
+const { openSavePop, openHintPop, openPostPop, closePostPop } = displayStore;
+const { isPopSave, isPopPost, isPopHint, hintStr } = storeToRefs(displayStore);
 
 const { createQuiz } = api;
 
@@ -32,6 +34,18 @@ const CreateReq = reactive({
   ],
 });
 
+let startDate;
+let endDate;
+
+/* postPop emit資料 */
+const handleStartDate = (start) => {
+  startDate = start;
+};
+
+const handleEndDate = (end) => {
+  endDate = end;
+};
+
 /* 如果selectionType == textarea -> 清空selections */
 const clearSelections = (index) => {
   if (CreateReq.question[index].selection_type == "textarea") {
@@ -46,7 +60,7 @@ const selectionsToString = (index) => {
   const filteredSelections = CreateReq.question[index].selection.filter(
     (item) => item != ""
   );
-  CreateReq.question[index].selection = filteredSelections.join(";");
+  return filteredSelections.join(";");
 };
 
 /* 問題+1 */
@@ -75,15 +89,25 @@ const deleteSelections = (index, seleindex) => {
 
 /* 點擊儲存按鈕 */
 const saveQuiz = () => {
+  //未輸入標題 -> 儲存失敗
+  if (CreateReq.quiz.title == "") {
+    hintStr.value = "儲存失敗<br/>至少要輸入標題";
+    console.log(hintStr.value);
+    openHintPop();
+    return;
+  }
+  console.log(CreateReq.quiz.title);
   // 打開彈跳視窗
   openSavePop();
 
   // 將選項內容從arr轉換str
-  let seleStr = "";
   CreateReq.question.forEach((item, index) => {
-    seleStr = selectionsToString(index);
     //將req中的selection轉換為字串
+    const seleStr = selectionsToString(index);
     CreateReq.question[index].selection = seleStr;
+    console.log(
+      "第" + (index + 1) + "題選項" + CreateReq.question[index].selection
+    );
   });
 
   //state設為: 尚未開始
@@ -92,13 +116,122 @@ const saveQuiz = () => {
   //create API(存入CreateReq)
   createQuiz(CreateReq);
 };
+
+/* 點擊發布按鈕，超多防呆 */
+const clickPostBtn = () => {
+  let data = true;
+
+  if (data == true) {
+    //未輸入標題 -> 不能發布
+    if (CreateReq.quiz.title == "") {
+      hintStr.value = "確認問卷標題是否輸入";
+      openHintPop();
+      data = false;
+    }
+
+    //未輸入說明 -> 不能發布
+    if (CreateReq.quiz.description == "") {
+      hintStr.value = "輸入問卷說明才能發布";
+      openHintPop();
+      data = false;
+    }
+
+    //沒有題目 -> 不能發布
+    if (CreateReq.question.length <= 0) {
+      hintStr.value = "至少要有一題才能發布";
+      openHintPop();
+      data = false;
+    }
+
+    //問題內有輸入q_name,selection才能發布
+    CreateReq.question.forEach((item) => {
+      if (item.q_name == "") {
+        hintStr.value = "確認問題名稱是否輸入";
+        openHintPop();
+        data = false;
+      }
+
+      //selection至少要兩個選項才能發布
+      if (item.selection.length < 2 && item.selection_type != "textarea") {
+        hintStr.value = "單選和複選至少要有2個選項";
+        openHintPop();
+        data = false;
+      }
+
+      item.selection.forEach((sele) => {
+        //selection至少要兩個選項(不是空字串)才能發布
+        if (sele == "" && item.selection_type != "textarea") {
+          hintStr.value = "確認選項內容是否輸入";
+          openHintPop();
+          data = false;
+        }
+      });
+    });
+    if (data) {
+      openPostPop();
+    }
+  }
+};
+
+/* 發布問卷 */
+const postQuiz = () => {
+  /* 日期防呆 */
+  const currentDateTime = new Date();
+  let data = true;
+  //先將日期轉為Date資料
+  CreateReq.quiz.start_time = new Date(startDate);
+  CreateReq.quiz.end_time = new Date(endDate);
+
+  // 將日期轉換為日期字串（僅包含日期部分）
+  const startDateStr = new Date(CreateReq.quiz.start_time)
+    .toISOString()
+    .split("T")[0];
+  const currentDateTimeStr = currentDateTime.toISOString().split("T")[0];
+
+  if (CreateReq.quiz.start_time == null || CreateReq.quiz.end_time == null) {
+    alert("請輸入日期");
+    data = false;
+  } else if (startDateStr < currentDateTimeStr) {
+    alert("發布日期不能小於今天");
+    data = false;
+  } else if (CreateReq.quiz.start_time > CreateReq.quiz.end_time) {
+    alert("發布日期不能大於結束日期");
+    data = false;
+  }
+  /* 用日期判斷state狀態 */
+
+  if (CreateReq.quiz.start_time <= currentDateTime) {
+    CreateReq.quiz.state = "發布中";
+  }
+
+  if (CreateReq.quiz.start_time > currentDateTime) {
+    CreateReq.quiz.state = "尚未開始";
+  }
+
+  // 將選項內容從arr轉換str
+  if (data) {
+    CreateReq.question.forEach((item, index) => {
+      //將req中的selection轉換為字串
+      const seleStr = selectionsToString(index);
+      CreateReq.question[index].selection = seleStr;
+      console.log(
+        "第" + (index + 1) + "題選項" + CreateReq.question[index].selection
+      );
+    });
+  }
+
+  if (data) {
+    //create API(存入CreateReq)
+    createQuiz(CreateReq);
+    //關閉popPost
+    closePostPop();
+  }
+};
 </script>
 
 <template>
   <!-- 測試資料 -->
-  <h4>
-    {{ CreateReq }}
-  </h4>
+  <h3>{{ CreateReq }}</h3>
   <!-- 測試資料 -->
 
   <label for="">標題</label>
@@ -206,13 +339,29 @@ const saveQuiz = () => {
 
   <button type="button" @click="addQuestions">問題+1</button>
   <button type="button" @click="saveQuiz(index)">儲存</button>
-  <button type="button">立即發布</button>
+  <button type="button" @click="clickPostBtn()">立即發布</button>
 
   <!-- 儲存彈跳視窗  -->
   <div class="popSave" v-if="isPopSave">
     <popSave />
   </div>
   <!-- 儲存彈跳視窗  -->
+
+  <!-- 發布問卷彈跳視窗  -->
+  <div class="popPost" v-if="isPopPost">
+    <popPost
+      :postQuiz="postQuiz"
+      @startDate="handleStartDate"
+      @endDate="handleEndDate"
+    />
+  </div>
+  <!-- 發布問卷彈跳視窗  -->
+
+  <!-- 提示訊息彈跳視窗  -->
+  <div class="popHint" v-if="isPopHint">
+    <popHint :hintStr="hintStr" />
+  </div>
+  <!-- 提示訊息彈跳視窗  -->
 </template>
 
 <style scoped lang="scss">

@@ -1,22 +1,22 @@
 <script setup>
-import { RouterLink } from "vue-router";
+import { defineProps } from "vue";
 /* pinia */
-import { useDisplayStore } from "../../stores/popStore.js";
+import { useDisplayStore } from "../stores/popStore.js";
 
 const displayStore = useDisplayStore();
-const { closeSavePop } = displayStore;
+const { closeHintPop } = displayStore;
+
+const props = defineProps(["hintStr"]);
 </script>
 
 <template>
   <div class="popBackground"></div>
 
   <div class="pop">
-    <p>問卷儲存成功</p>
-    <p>請至歷史紀錄查看</p>
+    <i class="fa-solid fa-xmark icon" @click="closeHintPop"></i>
+    <p class="hint" v-html="hintStr"></p>
 
-    <button type="button" @click="closeSavePop">
-      <RouterLink to="/search_backend">確認</RouterLink>
-    </button>
+    <button type="button" @click="closeHintPop">確認</button>
   </div>
 </template>
 
@@ -42,10 +42,28 @@ const { closeSavePop } = displayStore;
   z-index: 10;
   box-shadow: 5px 10px 6px -6px #1e5128;
 
-  p {
-    font-size: 1.2rem;
+  .icon {
+    font-size: 1.5rem;
     color: #1e5128;
-    text-align: center;
+    position: absolute;
+    top: 2%;
+    right: 2%;
+    transition: 0.5s ease;
+
+    &:hover {
+      cursor: pointer;
+    }
+  }
+
+  //   p {
+  //     font-size: 1.2rem;
+  //     color: #1e5128;
+  //     text-align: center;
+  //   }
+
+  .hint {
+    font-size: 1.2rem;
+    color: red;
   }
 
   button {

@@ -48,6 +48,17 @@ export const useDisplayStore = defineStore("display", () => {
     isPopPost.value = false;
   };
 
+  /* 提交答案彈跳視窗 */
+  const isPopSent = ref(false);
+
+  const openSentPop = () => {
+    isPopSent.value = true;
+  };
+
+  const closeSentPop = () => {
+    isPopSent.value = false;
+  };
+
   return {
     isPopHint,
     openHintPop,
@@ -62,5 +73,8 @@ export const useDisplayStore = defineStore("display", () => {
     isPopPost,
     openPostPop,
     closePostPop,
+    isPopSent,
+    openSentPop,
+    closeSentPop,
   };
 });

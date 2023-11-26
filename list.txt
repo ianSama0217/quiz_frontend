@@ -34,10 +34,18 @@ create 頁面全部完成
 
 11/26
 所有路徑建立完成(都可以取得指定問卷id)
+edit 頁面全部完成
+readquiz 頁面全部完成
+☆用array.map處裡二維陣列分割☆
+☆☆☆ input checkbox使用v-model只會回傳boolean ☆☆☆
 
- create bug
+ create、edit bug
  ※不輸入日期不會顯示提是錯誤訊息
  ※開始日期 = 結束日期，不會抱錯，儲存狀態->尚未開始
+
+  write bug
+ ※可以不填選項儲存  //判斷問題是否填寫 write.134
+  無法連接answer/create API state:415
 
  search_backend 
  ※歷史紀錄search要抓結束日期<date.now (state => 空開中->已結束)

@@ -43,6 +43,18 @@ const getQuizInfo = (id) => {
     .catch((e) => console.log(e));
 };
 
+//取得問卷作答資訊
+const getQuizAns = (id) => {
+  return axios
+    .get(`http://localhost:8080/answer/get?id=${id}`)
+    .then((res) => {
+      const data = res.data;
+      console.log(data);
+      return data;
+    })
+    .catch((e) => console.log(e));
+};
+
 /*post*/
 //新增問卷
 const createQuiz = (req) => {
@@ -53,6 +65,22 @@ const createQuiz = (req) => {
   })
     .then((res) => {
       console.log("新增問卷訊息" + res.data.rtnCode);
+    })
+    .catch((e) => {
+      console.log(e);
+      throw e;
+    });
+};
+
+//作答結束新增userinfo
+const createQuizAns = (req) => {
+  return axios({
+    method: "post",
+    url: `http://localhost:8080/answer/create`,
+    data: req,
+  })
+    .then((res) => {
+      console.log("新增答案訊息" + res.data.rtnCode);
     })
     .catch((e) => {
       console.log(e);
@@ -77,6 +105,8 @@ export default {
   getQuizFrontend,
   getQuizBackend,
   getQuizInfo,
+  getQuizAns,
   createQuiz,
+  createQuizAns,
   deleteQuiz,
 };

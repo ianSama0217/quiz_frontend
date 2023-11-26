@@ -1,12 +1,22 @@
 <script setup>
-import { ref, reactive, onBeforeMount, toRefs } from "vue";
+import { reactive, onBeforeMount, toRefs } from "vue";
 import { useRoute, useRouter } from "vue-router";
+import { storeToRefs } from "pinia";
 /* api */
 import api from "../api/index.js";
+/* 匯入組件 */
+import popHint from "../components/popHint.vue";
+import popSentAns from "../components/create/popSentAns.vue";
+/* pinia */
+import { useDisplayStore } from "../stores/popStore.js";
 
 const router = useRouter();
 
-const { getQuizInfo } = api;
+const displayStore = useDisplayStore();
+const { openHintPop, openSentPop } = displayStore;
+const { isPopHint, hintStr, isPopSent } = storeToRefs(displayStore);
+
+const { getQuizInfo, createQuizAns } = api;
 
 /* 儲存用JSON格式 */
 const CreateAnsReq = reactive({
@@ -43,15 +53,152 @@ const handleCheckbox = (Qindex, seleIndex) => {
   CreateAnsReq.userinfos[0].ans[Qindex] = selectedOptions;
 };
 
+/* 轉換ans資料型態 arr->str (用;隔開，內層(複選)用!隔開)*/
+const ansToString = () => {
+  // 判斷是否為陣列
+  const ansArr = Array.isArray(CreateAnsReq.userinfos[0].ans)
+    ? CreateAnsReq.userinfos[0].ans
+    : [];
+
+  const ansStr = ansArr
+    // 先判對item是否為複選，再分割
+    .map((item) => (Array.isArray(item) ? item.join("!") : item))
+    .join(";");
+
+  // 設定轉換後的值回 CreateAnsReq.userinfos[0].ans
+  CreateAnsReq.userinfos[0].ans = ansStr;
+
+  return ansStr;
+};
+
+/* 給定quiz_id、時間 */
+const setAnsReq = () => {
+  CreateAnsReq.userinfos[0].quiz_id = quizData.quiz.id;
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth() + 1; // 月份是從 0 開始的，所以要加 1
+  const day = now.getDate();
+  const hours = now.getHours();
+  const minutes = now.getMinutes();
+  const seconds = now.getSeconds();
+
+  const mysqlDatetime = `${year}-${month < 10 ? "0" : ""}${month}-${
+    day < 10 ? "0" : ""
+  }${day} ${hours < 10 ? "0" : ""}${hours}:${
+    minutes < 10 ? "0" : ""
+  }${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
+
+  // 將轉換後的時間設定給 date_time
+  CreateAnsReq.userinfos[0].date_time = mysqlDatetime;
+};
+
 /* 導向首頁 */
 const turnToEditView = () => {
   router.push("/");
 };
 
+/* 儲存答案 */
+const createAns = () => {
+  setAnsReq();
+  ansToString();
+  // 使用 toRefs 轉換為具有 ref 的原始數據
+  const refs = toRefs(CreateAnsReq);
+
+  // 使用 JSON.stringify 將轉換後的數據轉換為 JSON 字串
+  const jsonString = JSON.stringify(refs);
+
+  console.log(CreateAnsReq.userinfos[0].name);
+  console.log(CreateAnsReq.userinfos[0].quiz_id);
+  console.log(CreateAnsReq.userinfos[0].email);
+  console.log(CreateAnsReq.userinfos[0].phone_number);
+  console.log(CreateAnsReq.userinfos[0].ans);
+  console.log(typeof CreateAnsReq.userinfos[0].ans);
+  console.log(CreateAnsReq.userinfos[0].date_time);
+  console.log(typeof CreateAnsReq.userinfos[0].date_time);
+  console.log(CreateAnsReq);
+  createQuizAns(jsonString);
+};
+
+/* 點擊確認按鈕，超多防呆 */
+const clickCreateBtn = () => {
+  let data = true;
+
+  if (data == true) {
+    //沒有姓名 -> 不能發布
+    if (CreateAnsReq.userinfos[0].name == "") {
+      hintStr.value = "確認姓名是否輸入";
+      openHintPop();
+      data = false;
+    }
+
+    //未輸入標題 -> 不能發布
+    if (CreateAnsReq.userinfos[0].email == "") {
+      hintStr.value = "確認信箱是否輸入";
+      openHintPop();
+      data = false;
+    }
+
+    //未輸入說明 -> 不能發布
+    if (CreateAnsReq.userinfos[0].phone_number == "") {
+      hintStr.value = "確認手機號碼是否輸入";
+      openHintPop();
+      data = false;
+    }
+
+    // 檢查選項是否都有填寫答案
+    if (CreateAnsReq.userinfos[0].ans.length > 0) {
+      let allQuestionsAnswered = true; // 假設所有問題都有答案
+
+      //判斷問題是否填寫
+      CreateAnsReq.userinfos[0].ans.forEach((item, index) => {
+        // 如果是陣列，則檢查每個元素是否為空
+        if (Array.isArray(item)) {
+          if (item.length === 0) {
+            allQuestionsAnswered = false; // 有空答案，設定為 false
+            hintStr.value = `確認問題 ${index + 1} 是否填寫`;
+            openHintPop();
+            data = false;
+          } else {
+            let hasSelectedOption = false; // 假設沒有選擇的選項
+            item.forEach((e) => {
+              if (e !== null && e !== "") {
+                hasSelectedOption = true;
+              }
+            });
+            if (!hasSelectedOption) {
+              allQuestionsAnswered = false; // 沒有選擇的選項，設定為 false
+              hintStr.value = `確認問題 ${index + 1} 是否填寫`;
+              openHintPop();
+              data = false;
+            }
+          }
+        } else if (item === null || item === "") {
+          // 如果是字串，則檢查是否為空
+          allQuestionsAnswered = false; // 有空答案，設定為 false
+          hintStr.value = `確認問題 ${index + 1} 是否填寫`;
+          openHintPop();
+          data = false;
+        }
+      });
+
+      if (allQuestionsAnswered) {
+        // 所有問題都有答案，繼續執行你的邏輯
+        openSentPop();
+        createAns();
+      }
+    } else {
+      // 如果沒有任何答案，顯示提示
+      hintStr.value = "至少需要回答一個問題";
+      openHintPop();
+      data = false;
+    }
+  }
+};
+
 /*載入頁面前先取得指定id，顯示全部資料*/
 onBeforeMount(() => {
   const quizId = useRoute().params.id;
-  console.log("編輯問卷id: " + quizId);
+  console.log("填寫問卷id: " + quizId);
 
   //取得問卷資料
   getQuizInfo(quizId)
@@ -74,7 +221,7 @@ onBeforeMount(() => {
   <!-- 測試區域 -->
   <!-- <h3>{{ quizData }}</h3> -->
   <!-- <h3 v-for="item in quizData.question">{{ item.selection }}</h3> -->
-  <h3>{{ CreateAnsReq }}</h3>
+  <!-- <h3>{{ CreateAnsReq }}</h3> -->
   <!-- 測試區域 -->
 
   <div class="body">
@@ -187,9 +334,23 @@ onBeforeMount(() => {
     </div>
     <div class="apiBtn">
       <button type="button" @click="turnToEditView()">取消</button>
-      <button type="button" @click="">確認送出</button>
+      <button type="button" @click="clickCreateBtn()">確認送出</button>
     </div>
   </div>
+
+  <!-- 提示訊息彈跳視窗  -->
+  <div class="popHint" v-if="isPopHint">
+    <popHint :hintStr="hintStr" />
+  </div>
+  <!-- 提示訊息彈跳視窗  -->
+
+  <!-- 提交成功彈跳視窗  -->
+  <div class="popSent" v-if="isPopSent">
+    <popSentAns />
+  </div>
+  <!-- 提交成功彈跳視窗  -->
+
+  <h3>{{ CreateAnsReq }}</h3>
 </template>
 
 <style scoped lang="scss">

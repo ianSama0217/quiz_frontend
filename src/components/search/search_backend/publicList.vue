@@ -1,11 +1,30 @@
 <script setup>
 import { defineProps, defineEmits } from "vue";
+import { useRouter } from "vue-router";
+
+const router = useRouter();
 
 const props = defineProps(["getValue"]);
 const emits = defineEmits(["deleteQuizItem"]);
 
 const emitDeleteQuiz = (id) => {
   emits("deleteQuizItem", id);
+};
+
+const turnToEditView = (data) => {
+  router.push({ name: "edit", params: { id: data.id, title: data.title } });
+};
+
+const turnToWriteView = (data) => {
+  router.push({ name: "write", params: { id: data.id, title: data.title } });
+};
+
+const turnToReadQuizView = (data) => {
+  router.push({ name: "readquiz", params: { id: data.id, title: data.title } });
+};
+
+const turnToReadDataView = (data) => {
+  router.push({ name: "readdata", params: { id: data.id, title: data.title } });
 };
 </script>
 
@@ -16,9 +35,11 @@ const emitDeleteQuiz = (id) => {
 
     <!-- 尚未開始顯示的icon -->
     <div class="iconBar" v-show="data.state === '尚未開始'">
-      <RouterLink to="/" title="編輯問卷">
-        <i class="fa-regular fa-pen-to-square icon"></i>
-      </RouterLink>
+      <i
+        @click="turnToEditView(data)"
+        class="fa-regular fa-pen-to-square icon"
+        title="編輯問卷"
+      ></i>
 
       <button @click="emitDeleteQuiz(data.id)" type="button" title="刪除問卷">
         <i class="fa-regular fa-trash-can icon"></i>
@@ -28,25 +49,33 @@ const emitDeleteQuiz = (id) => {
 
     <!-- 發布中顯示的icon -->
     <div class="iconBar" v-show="data.state === '發布中'">
-      <RouterLink to="/" title="查看問卷">
-        <i class="fa-regular fa-eye icon"></i>
-      </RouterLink>
+      <i
+        @click="turnToReadQuizView(data)"
+        class="fa-regular fa-eye icon"
+        title="查看問卷"
+      ></i>
 
-      <RouterLink to="/" title="填寫問卷">
-        <i class="fa-solid fa-pencil icon"></i>
-      </RouterLink>
+      <i
+        @click="turnToWriteView(data)"
+        class="fa-solid fa-pencil icon"
+        title="填寫問卷"
+      ></i>
     </div>
     <!-- 發布中顯示的icon -->
 
     <!-- 已結束顯示的icon -->
     <div class="iconBar" v-show="data.state === '已結束'">
-      <RouterLink to="/" title="查看問卷">
-        <i class="fa-regular fa-eye icon"></i>
-      </RouterLink>
+      <i
+        @click="turnToReadQuizView(data)"
+        class="fa-regular fa-eye icon"
+        title="查看問卷"
+      ></i>
 
-      <RouterLink to="/" title="查看數據">
-        <i class="fa-solid fa-chart-column icon"></i>
-      </RouterLink>
+      <i
+        @click="turnToReadDataView(data)"
+        class="fa-solid fa-chart-column icon"
+        title="查看數據"
+      ></i>
 
       <button @click="emitDeleteQuiz(data.id)" type="button" title="刪除問卷">
         <i class="fa-regular fa-trash-can icon"></i>
@@ -85,6 +114,9 @@ const emitDeleteQuiz = (id) => {
     .icon {
       font-size: 1.5rem;
       color: #1e5128;
+      &:hover {
+        cursor: pointer;
+      }
     }
 
     button {

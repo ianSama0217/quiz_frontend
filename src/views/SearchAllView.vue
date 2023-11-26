@@ -14,7 +14,7 @@ const displayStore = useDisplayStore();
 const { openDeletePop, closeDeletePop } = displayStore;
 const { isPopDelete } = storeToRefs(displayStore);
 
-const { getQuizBackend, getQuizInfo, deleteQuiz } = api;
+const { getQuizBackend, deleteQuiz } = api;
 
 /* 搜尋欄位 */
 const inputTitle = ref("");

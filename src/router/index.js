@@ -24,6 +24,26 @@ const router = createRouter({
       component: () => import("../views/SearchAllView.vue"),
     },
     {
+      path: "/edit/:id/:title",
+      name: "edit",
+      component: () => import("../views/EditView.vue"),
+    },
+    {
+      path: "/write/:id/:title",
+      name: "write",
+      component: () => import("../views/WriteView.vue"),
+    },
+    {
+      path: "/read/quiz/:id/:title",
+      name: "readquiz",
+      component: () => import("../views/ReadQuizView.vue"),
+    },
+    {
+      path: "/read/data/:id/:title",
+      name: "readdata",
+      component: () => import("../views/ReadDataView.vue"),
+    },
+    {
       path: "/:domain(.*)*",
       name: "error",
       component: () => import("../views/ErrorView.vue"),

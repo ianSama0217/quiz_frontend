@@ -1,5 +1,5 @@
 <script setup>
-import { ref, reactive, onBeforeMount, toRefs } from "vue";
+import { reactive, onBeforeMount, toRefs } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { storeToRefs } from "pinia";
 /* api */

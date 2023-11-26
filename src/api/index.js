@@ -69,26 +69,10 @@ const deleteQuiz = (id) => {
     });
 };
 
-//刪除問題(包含對應qId的選項)
-const deleteQestion = (qId) => {
-  return axios
-    .post(`http://localhost:8080/question/delete?qId=${qId}`)
-    .then((res) => {
-      console.log(res);
-      const data = res.data.quizs;
-      return data;
-    })
-    .catch((e) => {
-      console.log(e);
-      throw e;
-    });
-};
-
 export default {
   getQuizFrontend,
   getQuizBackend,
   getQuizInfo,
   createQuiz,
   deleteQuiz,
-  deleteQestion,
 };

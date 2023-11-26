@@ -35,7 +35,11 @@ const getQuizBackend = (title, state) => {
 const getQuizInfo = (id) => {
   return axios
     .get(`http://localhost:8080/quiz/get?id=${id}`)
-    .then((res) => console.log(res))
+    .then((res) => {
+      const data = res.data;
+      console.log(data);
+      return data;
+    })
     .catch((e) => console.log(e));
 };
 

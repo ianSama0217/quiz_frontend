@@ -74,22 +74,7 @@ const ansToString = () => {
 /* 給定quiz_id、時間 */
 const setAnsReq = () => {
   CreateAnsReq.userinfos[0].quiz_id = quizData.quiz.id;
-  const now = new Date();
-  const year = now.getFullYear();
-  const month = now.getMonth() + 1; // 月份是從 0 開始的，所以要加 1
-  const day = now.getDate();
-  const hours = now.getHours();
-  const minutes = now.getMinutes();
-  const seconds = now.getSeconds();
-
-  const mysqlDatetime = `${year}-${month < 10 ? "0" : ""}${month}-${
-    day < 10 ? "0" : ""
-  }${day} ${hours < 10 ? "0" : ""}${hours}:${
-    minutes < 10 ? "0" : ""
-  }${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
-
-  // 將轉換後的時間設定給 date_time
-  CreateAnsReq.userinfos[0].date_time = mysqlDatetime;
+  CreateAnsReq.userinfos[0].date_time = new Date();
 };
 
 /* 導向首頁 */
@@ -101,22 +86,7 @@ const turnToEditView = () => {
 const createAns = () => {
   setAnsReq();
   ansToString();
-  // 使用 toRefs 轉換為具有 ref 的原始數據
-  const refs = toRefs(CreateAnsReq);
-
-  // 使用 JSON.stringify 將轉換後的數據轉換為 JSON 字串
-  const jsonString = JSON.stringify(refs);
-
-  console.log(CreateAnsReq.userinfos[0].name);
-  console.log(CreateAnsReq.userinfos[0].quiz_id);
-  console.log(CreateAnsReq.userinfos[0].email);
-  console.log(CreateAnsReq.userinfos[0].phone_number);
-  console.log(CreateAnsReq.userinfos[0].ans);
-  console.log(typeof CreateAnsReq.userinfos[0].ans);
-  console.log(CreateAnsReq.userinfos[0].date_time);
-  console.log(typeof CreateAnsReq.userinfos[0].date_time);
-  console.log(CreateAnsReq);
-  createQuizAns(jsonString);
+  createQuizAns(CreateAnsReq);
 };
 
 /* 點擊確認按鈕，超多防呆 */
@@ -129,6 +99,7 @@ const clickCreateBtn = () => {
       hintStr.value = "確認姓名是否輸入";
       openHintPop();
       data = false;
+      return;
     }
 
     //未輸入標題 -> 不能發布
@@ -136,6 +107,7 @@ const clickCreateBtn = () => {
       hintStr.value = "確認信箱是否輸入";
       openHintPop();
       data = false;
+      return;
     }
 
     //未輸入說明 -> 不能發布
@@ -143,6 +115,7 @@ const clickCreateBtn = () => {
       hintStr.value = "確認手機號碼是否輸入";
       openHintPop();
       data = false;
+      return;
     }
 
     // 檢查選項是否都有填寫答案

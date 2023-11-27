@@ -10,7 +10,7 @@ const { closeSentPop } = displayStore;
 
 const turnTosearch = () => {
   closeSentPop();
-  router.push("/search_backend");
+  // router.push("/search_backend");
 };
 </script>
 

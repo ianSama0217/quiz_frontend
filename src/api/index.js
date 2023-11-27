@@ -46,7 +46,7 @@ const getQuizInfo = (id) => {
 //取得問卷作答資訊
 const getQuizAns = (id) => {
   return axios
-    .get(`http://localhost:8080/answer/get?id=${id}`)
+    .get(`http://localhost:8080/quiz/create/answer?id=${id}`)
     .then((res) => {
       const data = res.data;
       console.log(data);
@@ -76,7 +76,7 @@ const createQuiz = (req) => {
 const createQuizAns = (req) => {
   return axios({
     method: "post",
-    url: `http://localhost:8080/answer/create`,
+    url: `http://localhost:8080/quiz/create/answer`,
     data: req,
   })
     .then((res) => {

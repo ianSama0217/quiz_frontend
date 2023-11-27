@@ -74,12 +74,15 @@ const ansToString = () => {
 /* 給定quiz_id、時間 */
 const setAnsReq = () => {
   CreateAnsReq.userinfos[0].quiz_id = quizData.quiz.id;
-  CreateAnsReq.userinfos[0].date_time = new Date();
+  let now = new Date();
+  now.setHours(now.getHours() - 4);
+  CreateAnsReq.userinfos[0].date_time = now;
+  console.log(CreateAnsReq.userinfos[0].date_time);
 };
 
 /* 導向首頁 */
-const turnToEditView = () => {
-  router.push("/");
+const turnToSearchView = () => {
+  router.push("/search");
 };
 
 /* 儲存答案 */
@@ -306,7 +309,7 @@ onBeforeMount(() => {
       </div>
     </div>
     <div class="apiBtn">
-      <button type="button" @click="turnToEditView()">取消</button>
+      <button type="button" @click="turnToSearchView()">取消</button>
       <button type="button" @click="clickCreateBtn()">確認送出</button>
     </div>
   </div>
@@ -322,8 +325,6 @@ onBeforeMount(() => {
     <popSentAns />
   </div>
   <!-- 提交成功彈跳視窗  -->
-
-  <h3>{{ CreateAnsReq }}</h3>
 </template>
 
 <style scoped lang="scss">

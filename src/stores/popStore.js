@@ -59,6 +59,17 @@ export const useDisplayStore = defineStore("display", () => {
     isPopSent.value = false;
   };
 
+  /* 查看data填寫人員彈跳視窗 */
+  const isPopData = ref(false);
+
+  const openDataPop = () => {
+    isPopData.value = true;
+  };
+
+  const closeDataPop = () => {
+    isPopData.value = false;
+  };
+
   return {
     isPopHint,
     openHintPop,
@@ -76,5 +87,8 @@ export const useDisplayStore = defineStore("display", () => {
     isPopSent,
     openSentPop,
     closeSentPop,
+    isPopData,
+    openDataPop,
+    closeDataPop,
   };
 });

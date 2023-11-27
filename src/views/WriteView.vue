@@ -82,7 +82,7 @@ const setAnsReq = () => {
 
 /* 導向首頁 */
 const turnToSearchView = () => {
-  router.push("/search");
+  router.push("/search_backend");
 };
 
 /* 儲存答案 */

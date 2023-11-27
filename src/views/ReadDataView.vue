@@ -1,15 +1,31 @@
 <script setup>
-import { ref, onBeforeMount, toRefs, reactive, toRef } from "vue";
-import { useRoute } from "vue-router";
+import { ref, onBeforeMount, toRefs, reactive } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import { storeToRefs } from "pinia";
 /* api */
 import api from "../api/index.js";
+/* 匯入組件 */
+import popData from "../components/readData/popData.vue";
+/* pinia */
+import { useDisplayStore } from "../stores/popStore.js";
+
+const router = useRouter();
+
+const displayStore = useDisplayStore();
+const { openDataPop } = displayStore;
+const { isPopData } = storeToRefs(displayStore);
 
 const { getQuizInfo, getQuizAns } = api;
+
 //接收問卷資料 & 使用者資料
 let AllData = reactive({
   quizData: {},
   ansData: {},
 });
+
+const turnToSearchView = () => {
+  router.push("/search_backend");
+};
 
 /*載入頁面前先取得指定id，顯示全部資料*/
 onBeforeMount(() => {
@@ -60,13 +76,109 @@ onBeforeMount(() => {
   <!-- 測試區域 -->
   <!-- {{ AllData }} -->
   <div class="test" v-for="item in AllData.quizData.question">
-    <p>///問卷資料:///{{ item.selection }}</p>
+    <p>{{ item }}</p>
+    <!-- <p>///問卷資料:///{{ item.selection }}</p> -->
   </div>
 
   <div class="test" v-for="item in AllData.ansData.userinfos">
-    <p>///答案資料:///{{ item.ans }}</p>
+    <p>{{ item }}</p>
+    <!-- <p>///答案資料:///{{ item.ans }}</p> -->
   </div>
   <!-- 測試區域 -->
+  <div class="body">
+    <div class="questionTitle">
+      <span class="title">{{ AllData.quizData.quiz.title }}</span>
+    </div>
+
+    <div class="userinfo">
+      <span
+        ><i class="fa-solid fa-user icon"></i>填寫人數:{{
+          AllData.ansData.userinfos.length
+        }}</span
+      >
+      <button @click="openDataPop()" type="button">詳細資料</button>
+    </div>
+
+    <div class="questionArea">
+      <!-- 單個問題區塊  -->
+      <div
+        class="questionBox"
+        v-for="(item, index) in AllData.quizData.question"
+        :key="index"
+      >
+        <!-- 設定問題內容   -->
+        <div class="setQuestion">
+          <div class="setQName">
+            <span class="qname">{{ item.q_name }}</span>
+          </div>
+
+          <!-- 設定選項內容  -->
+          <div class="setSelection">
+            <!-- 單選區域   -->
+            <div
+              class="radio"
+              v-if="AllData.quizData.question[index].selection_type == 'radio'"
+            >
+              <div
+                class="singleRadio"
+                v-for="(item, seleindex) in AllData.quizData.question[index]
+                  .selection"
+                :key="seleindex"
+              >
+                <input type="radio" disabled="false" />
+                <span class="sele">{{
+                  AllData.quizData.question[index].selection[seleindex]
+                }}</span>
+              </div>
+            </div>
+            <!-- 單選區域   -->
+
+            <!-- 複選區域   -->
+            <div
+              class="checkbox"
+              v-if="
+                AllData.quizData.question[index].selection_type == 'checkbox'
+              "
+            >
+              <div
+                class="singleCheckbox"
+                v-for="(item, seleindex) in AllData.quizData.question[index]
+                  .selection"
+                :key="seleindex"
+              >
+                <input type="checkbox" disabled="false" />
+                <span class="sele">{{
+                  AllData.quizData.question[index].selection[seleindex]
+                }}</span>
+              </div>
+            </div>
+            <!-- 複選區域   -->
+
+            <!-- 文字方塊   -->
+            <div
+              class="textarea"
+              v-if="
+                AllData.quizData.question[index].selection_type == 'textarea'
+              "
+            >
+              <textarea disabled="false" placeholder="作答區域"></textarea>
+            </div>
+            <!-- 文字方塊   -->
+          </div>
+          <!-- 設定選項內容  -->
+        </div>
+        <!-- 設定問題內容   -->
+      </div>
+    </div>
+    <div class="apiBtn">
+      <button type="button" @click="">下載PDF</button>
+      <button type="button" @click="turnToSearchView()">確認</button>
+    </div>
+  </div>
+
+  <div class="popData" v-if="isPopData">
+    <popData :userinfo="AllData.ansData.userinfos" />
+  </div>
 </template>
 
 <style scoped lang="scss">
@@ -102,49 +214,28 @@ button {
     }
   }
 
-  .quizDesp {
-    width: 50vw;
-    border-radius: 12px;
-    background-color: #8ec3b0;
+  .userinfo {
+    width: 25vw;
     color: #1e5128;
     padding: 0.5rem 1rem 1rem 1rem;
     margin: 0.8rem 0;
-    box-shadow: 0px 5px 6px -6px #1e5128;
     display: flex;
-    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
 
-    .desp {
-      font-size: 1.2rem;
-      color: #1e5128;
-      margin: 0.5rem 0;
-    }
-  }
-
-  .userInfo {
-    width: 50vw;
-    border-radius: 12px;
-    background-color: #8ec3b0;
-    color: #1e5128;
-    padding: 0.5rem 1rem 1rem 1rem;
-    margin: 0.8rem 0;
-    box-shadow: 0px 5px 6px -6px #1e5128;
-    display: flex;
-    flex-direction: column;
-
-    label {
+    span {
       font-size: 1.2rem;
       margin-bottom: 0.2rem;
     }
 
-    input {
-      border: none;
-      outline: none;
-      background-color: #8ec3b0;
-      border-bottom: 1px solid #1e5128;
-      height: 1.5rem;
-      font-size: 1.2rem;
-      padding: 0.2rem;
-      margin-bottom: 0.5rem;
+    .icon {
+      font-size: 1.5rem;
+      color: #1e5128;
+      margin-right: 0.5rem;
+
+      &:hover {
+        cursor: pointer;
+      }
     }
   }
 

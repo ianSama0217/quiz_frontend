@@ -127,7 +127,7 @@ onBeforeMount(() => {
       </div>
     </div>
     <div class="apiBtn">
-      <button type="button" @click="">儲存PDF</button>
+      <button type="button" @click="">下載PDF</button>
       <button type="button" @click="turnToEditView()">確認</button>
     </div>
   </div>

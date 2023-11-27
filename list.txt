@@ -39,6 +39,12 @@ readquiz 頁面全部完成
 ☆用array.map處裡二維陣列分割☆
 ☆☆☆ input checkbox使用v-model只會回傳boolean ☆☆☆
 
+11/27
+readDate 匯入題目跟userinfo API
+預計在題目下方建立每一題的圖表(chart.js)
+☆處理物件(object資料)要使用toRefs去接收才能使其為響應式資料☆
+☆☆☆資料庫的時間和JS內的時間不同步，之後處理時間日期相關資料要先確認日期資料型態☆☆☆
+
  create、edit bug
  ※不輸入日期不會顯示提是錯誤訊息
  ※開始日期 = 結束日期，不會抱錯，儲存狀態->尚未開始
@@ -46,6 +52,7 @@ readquiz 頁面全部完成
   write bug
  ※可以不填選項儲存  //判斷問題是否填寫 write.134
  ※無法連接answer/create API state:415 (11/27 date_time資料型態錯誤)
+ ※radio名稱相同的時候會同時選取相同名稱選項
 
 
  search_backend 
@@ -53,4 +60,4 @@ readquiz 頁面全部完成
  ※歷史紀錄search要抓 開始日期 == date.now (state 從未公開->空開中)
  ※紀錄要從最新的到舊的(orderById desc)  11/26完成
 
- ※資料庫的時間和JS內的時間不同步，之後處理時間日期相關資料要先確認日期資料型態
+ 

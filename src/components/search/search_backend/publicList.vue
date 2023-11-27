@@ -60,6 +60,12 @@ const turnToReadDataView = (data) => {
         class="fa-solid fa-pencil icon"
         title="填寫問卷"
       ></i>
+
+      <i
+        @click="turnToReadDataView(data)"
+        class="fa-solid fa-chart-column icon"
+        title="查看數據"
+      ></i>
     </div>
     <!-- 發布中顯示的icon -->
 

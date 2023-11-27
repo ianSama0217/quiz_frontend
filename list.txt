@@ -45,9 +45,12 @@ readquiz 頁面全部完成
 
   write bug
  ※可以不填選項儲存  //判斷問題是否填寫 write.134
-  無法連接answer/create API state:415
+ ※無法連接answer/create API state:415 (11/27 date_time資料型態錯誤)
+
 
  search_backend 
  ※歷史紀錄search要抓結束日期<date.now (state => 空開中->已結束)
  ※歷史紀錄search要抓 開始日期 == date.now (state 從未公開->空開中)
  ※紀錄要從最新的到舊的(orderById desc)  11/26完成
+
+ ※資料庫的時間和JS內的時間不同步，之後處理時間日期相關資料要先確認日期資料型態

@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onBeforeMount, toRefs, reactive } from "vue";
+import { ref, onBeforeMount, onMounted, toRefs, reactive } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { storeToRefs } from "pinia";
 /* api */
@@ -8,6 +8,8 @@ import api from "../api/index.js";
 import popData from "../components/readData/popData.vue";
 /* pinia */
 import { useDisplayStore } from "../stores/popStore.js";
+/* 匯入chartjs */
+import Chart from "chart.js/auto";
 
 const router = useRouter();
 
@@ -23,58 +25,137 @@ let AllData = reactive({
   ansData: {},
 });
 
+//儲存data陣列
+let chartConfigs = [];
+//設定資料類型
+const chartType = ref("bar");
+
 const turnToSearchView = () => {
   router.push("/search_backend");
 };
 
+//創建新的chartjs
+function createChart(config) {
+  const { ctx, labels, data, backgroundColor, borderColor } = config;
+
+  const chart = new Chart(ctx, {
+    type: chartType.value, // 使用 chartType 來設置圖表類型
+    data: {
+      labels: labels,
+      datasets: [
+        {
+          label: "這是標題",
+          data: data,
+          fill: false,
+          backgroundColor: backgroundColor,
+          borderColor: borderColor,
+          tension: 0.1,
+        },
+      ],
+    },
+  });
+
+  return chart;
+}
+
 /*載入頁面前先取得指定id，顯示全部資料*/
-onBeforeMount(() => {
+onBeforeMount(async () => {
   const quizId = useRoute().params.id;
   console.log("查看數據問卷id: " + quizId);
 
   // 取得問卷題目資料
-  getQuizInfo(quizId)
-    .then((quizRes) => {
-      Object.assign(AllData.quizData, reactive(toRefs(quizRes)));
+  try {
+    await getQuizInfo(quizId)
+      .then((quizRes) => {
+        Object.assign(AllData.quizData, reactive(toRefs(quizRes)));
 
-      //將selection資料轉換(str -> arr)
-      AllData.quizData.question.forEach((ques) => {
-        ques.selection = ques.selection.split(";");
+        //將selection資料轉換(str -> arr)
+        AllData.quizData.question.forEach((ques) => {
+          ques.selection = ques.selection.split(";");
+        });
+      })
+      .catch((e) => {
+        throw e;
       });
-    })
-    .catch((e) => {
-      throw e;
-    });
+  } catch (e) {
+    throw e;
+  }
 
   // 取得問卷答案資料
-  getQuizAns(quizId)
-    .then((ansRes) => {
-      Object.assign(AllData.ansData, reactive(toRefs(ansRes)));
+  try {
+    await getQuizAns(quizId)
+      .then((ansRes) => {
+        Object.assign(AllData.ansData, reactive(toRefs(ansRes)));
 
-      console.log();
-      //將ans資料轉換(str -> arr)
-      AllData.ansData.userinfos.map((item) => {
-        //先處理外維陣列
-        item.ans = item.ans.split(";");
-        console.log(item.ans);
+        console.log();
+        //將ans資料轉換(str -> arr)
+        AllData.ansData.userinfos.map((item) => {
+          //先處理外維陣列
+          item.ans = item.ans.split(";");
+          // console.log(item.ans);
 
-        //處理二維陣列(複選題)
-        item.ans = item.ans.map((ans) =>
-          ans.includes("!") ? ans.split("!") : ans
-        );
-        console.log(item.ans);
+          //處理二維陣列(複選題)
+          item.ans = item.ans.map((ans) =>
+            ans.includes("!") ? ans.split("!") : ans
+          );
+          // console.log(item.ans);
+        });
+      })
+      .catch((e) => {
+        throw e;
       });
-    })
-    .catch((e) => {
-      throw e;
-    });
+  } catch (e) {
+    throw e;
+  }
+
+  console.log(AllData.quizData.question);
+  AllData.quizData.question.forEach((item, index) => {
+    const ctx = document.getElementById("myChart" + index);
+
+    const chartConfig = {
+      ctx,
+      labels: [
+        "一月份",
+        "二月份",
+        "三月份",
+        "四月份",
+        "五月份",
+        "六月份",
+        "七月份",
+      ],
+      data: [65, 59, 80, 81, 56, 55, 40],
+      backgroundColor: [
+        "rgba(255, 99, 132, 0.2)",
+        "rgba(255, 159, 64, 0.2)",
+        "rgba(255, 205, 86, 0.2)",
+        "rgba(75, 192, 192, 0.2)",
+        "rgba(54, 162, 235, 0.2)",
+        "rgba(153, 102, 255, 0.2)",
+        "rgba(201, 203, 207, 0.2)",
+      ],
+      borderColor: [
+        "rgb(255, 99, 132)",
+        "rgb(255, 159, 64)",
+        "rgb(255, 205, 86)",
+        "rgb(75, 192, 192)",
+        "rgb(54, 162, 235)",
+        "rgb(153, 102, 255)",
+        "rgb(201, 203, 207)",
+      ],
+    };
+
+    chartConfigs.push(chartConfig);
+    createChart(chartConfig);
+  });
 });
+
+//利用取得的資料作出相應的data
 </script>
 
 <template>
   <h1>資料</h1>
   <!-- 測試區域 -->
-  <!-- {{ AllData }} -->
+  {{ AllData }}
   <div class="test" v-for="item in AllData.quizData.question">
     <p>{{ item }}</p>
     <!-- <p>///問卷資料:///{{ item.selection }}</p> -->
@@ -99,14 +180,14 @@ onBeforeMount(() => {
       <button @click="openDataPop()" type="button">詳細資料</button>
     </div>
 
-    <div class="questionArea">
+    <div
+      class="questionArea"
+      v-for="(item, index) in AllData.quizData.question"
+      :key="index"
+    >
       <div class="line"></div>
       <!-- 單個問題區塊  -->
-      <div
-        class="questionBox"
-        v-for="(item, index) in AllData.quizData.question"
-        :key="index"
-      >
+      <div class="questionBox">
         <!-- 設定問題內容   -->
         <div class="setQuestion">
           <div class="setQName">
@@ -170,6 +251,12 @@ onBeforeMount(() => {
         </div>
         <!-- 設定問題內容   -->
       </div>
+
+      <!-- 數據圖表 -->
+      <div class="dataChart">
+        <canvas :id="'myChart' + index"></canvas>
+      </div>
+      <!-- 數據圖表 -->
     </div>
 
     <div class="apiBtn">
@@ -243,11 +330,13 @@ button {
 
   .line {
     border-bottom: 2px solid #1e5128;
+    width: 50vw;
   }
 
   .questionArea {
     display: flex;
     flex-direction: column;
+    align-items: center;
 
     .questionBox {
       width: 50vw;
@@ -326,6 +415,13 @@ button {
           }
         }
       }
+    }
+
+    .dataChart {
+      border: 1px solid red;
+      width: 50vw;
+      min-height: 40vh;
+      margin-bottom: 1rem;
     }
   }
   .apiBtn {

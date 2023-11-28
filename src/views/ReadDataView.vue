@@ -100,6 +100,7 @@ onBeforeMount(() => {
     </div>
 
     <div class="questionArea">
+      <div class="line"></div>
       <!-- 單個問題區塊  -->
       <div
         class="questionBox"
@@ -170,6 +171,7 @@ onBeforeMount(() => {
         <!-- 設定問題內容   -->
       </div>
     </div>
+
     <div class="apiBtn">
       <button type="button" @click="">下載PDF</button>
       <button type="button" @click="turnToSearchView()">確認</button>
@@ -237,6 +239,10 @@ button {
         cursor: pointer;
       }
     }
+  }
+
+  .line {
+    border-bottom: 2px solid #1e5128;
   }
 
   .questionArea {

@@ -16,7 +16,7 @@ $darkColor: #9ed5c5;
 $themeColor: #8ec3b0;
 $textColor: #1e5128;
 p {
-  margin-top: 1rem;
+  margin: 1.6rem 0;
   font-size: 1.5rem;
   color: $textColor;
   text-align: center;

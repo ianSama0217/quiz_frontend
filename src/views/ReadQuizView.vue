@@ -12,7 +12,7 @@ const { getQuizInfo } = api;
 const quizData = reactive({});
 
 const turnToEditView = () => {
-  router.push("/");
+  router.push("/search_backend");
 };
 
 /*載入頁面前先取得指定id，顯示全部資料*/

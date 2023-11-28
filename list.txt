@@ -48,6 +48,7 @@ readDate 匯入題目跟userinfo API
  create、edit bug
  ※不輸入日期不會顯示提是錯誤訊息
  ※開始日期 = 結束日期，不會抱錯，儲存狀態->尚未開始
+ ※發布或儲存後後，到後台有時候不會更新最新一筆資料(async)
 
   write bug
  ※可以不填選項儲存  //判斷問題是否填寫 write.134

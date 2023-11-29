@@ -4,7 +4,7 @@ import { useRouter } from "vue-router";
 
 const router = useRouter();
 
-const props = defineProps(["getValue"]);
+const props = defineProps(["getValue", "limit10List"]);
 const emits = defineEmits(["deleteQuizItem"]);
 
 const emitDeleteQuiz = (id) => {

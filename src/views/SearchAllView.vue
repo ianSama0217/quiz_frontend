@@ -1,11 +1,10 @@
 <script setup>
-import { ref, onBeforeMount } from "vue";
+import { ref, onBeforeMount, watch } from "vue";
 import { storeToRefs } from "pinia";
 /* api*/
 import api from "../api/index.js";
 /* 匯入組件 */
 import publicList from "../components/search/search_backend/publicList.vue";
-import changePageBtn from "../components/search/changePageBtn.vue";
 import popDelete from "../components/search/search_backend/popDelete.vue";
 /* pinia */
 import { useDisplayStore } from "../stores/popStore.js";
@@ -22,7 +21,8 @@ const inputState = ref("");
 
 /*接收API資料*/
 const getQuizValues = ref([]);
-
+//依照當前頁面顯示的資料
+const displayList = ref([]);
 /*儲存指定問卷id*/
 const quizId = ref(0);
 
@@ -93,6 +93,7 @@ onBeforeMount(() => {
     <div class="publicList">
       <publicList
         :getValue="getQuizValues"
+        :limit10List="currentPage"
         @deleteQuizItem="handleDeleteQuiz"
       />
     </div>
@@ -100,7 +101,7 @@ onBeforeMount(() => {
 
     <!-- 切換頁面 -->
     <div class="changePage">
-      <changePageBtn />
+      <changePageBtn @pageItem="handleChangePage" :quizLength="getQuizValues" />
     </div>
     <!-- 切換頁面 -->
 

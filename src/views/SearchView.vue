@@ -1,15 +1,16 @@
 <script setup>
-import { ref, onBeforeMount } from "vue";
+import { ref, onBeforeMount, watch } from "vue";
 import api from "../api/index.js";
 /* 匯入組件 */
 import resList from "../components/search/resList.vue";
-import changePageBtn from "../components/search/changePageBtn.vue";
 
-const { getQuizFrontend, getQuizInfo } = api;
+const { getQuizFrontend } = api;
 
 const inputTitle = ref("");
-
+//search取得的所有資料
 const getQuizValues = ref([]);
+
+console.log(getQuizValues);
 
 const search = (inputTitle) => {
   getQuizFrontend(inputTitle)
@@ -49,7 +50,7 @@ onBeforeMount(() => {
 
     <!-- 切換頁面 -->
     <div class="changePage">
-      <changePageBtn />
+      <changePageBtn @pageItem="handleChangePage" :quizLength="getQuizValues" />
     </div>
     <!-- 切換頁面 -->
   </div>

@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onBeforeMount, onMounted, toRefs, reactive } from "vue";
+import { ref, onBeforeMount, watch, toRefs, reactive } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { storeToRefs } from "pinia";
 /* api */
@@ -25,38 +25,12 @@ let AllData = reactive({
   ansData: {},
 });
 
-//儲存data陣列
-let chartConfigs = [];
-//設定資料類型
-const chartType = ref("bar");
+//設定chartJs類型
+const chartTypes = ref([]);
 
 const turnToSearchView = () => {
   router.push("/search_backend");
 };
-
-//創建新的chartjs
-function createChart(config) {
-  const { ctx, labels, data, backgroundColor, borderColor } = config;
-
-  const chart = new Chart(ctx, {
-    type: chartType.value, // 使用 chartType 來設置圖表類型
-    data: {
-      labels: labels,
-      datasets: [
-        {
-          label: "這是標題",
-          data: data,
-          fill: false,
-          backgroundColor: backgroundColor,
-          borderColor: borderColor,
-          tension: 0.1,
-        },
-      ],
-    },
-  });
-
-  return chart;
-}
 
 /*載入頁面前先取得指定id，顯示全部資料*/
 onBeforeMount(async () => {
@@ -108,54 +82,121 @@ onBeforeMount(async () => {
     throw e;
   }
 
-  console.log(AllData.quizData.question);
+  //依照問題類型製作統計圖表(單、複選 || 文字方塊)
+  //儲存dataChart陣列
+  let chartConfigs = [];
+
+  // 在這裡設置 chartTypes 的初始值(長條圖)
+  chartTypes.value = AllData.quizData.question.map(() => "bar");
+
   AllData.quizData.question.forEach((item, index) => {
     const ctx = document.getElementById("myChart" + index);
+    const ctx2 = document.getElementById("myChart2" + index);
 
-    const chartConfig = {
-      ctx,
-      labels: [
-        "一月份",
-        "二月份",
-        "三月份",
-        "四月份",
-        "五月份",
-        "六月份",
-        "七月份",
-      ],
-      data: [65, 59, 80, 81, 56, 55, 40],
-      backgroundColor: [
-        "rgba(255, 99, 132, 0.2)",
-        "rgba(255, 159, 64, 0.2)",
-        "rgba(255, 205, 86, 0.2)",
-        "rgba(75, 192, 192, 0.2)",
-        "rgba(54, 162, 235, 0.2)",
-        "rgba(153, 102, 255, 0.2)",
-        "rgba(201, 203, 207, 0.2)",
-      ],
-      borderColor: [
-        "rgb(255, 99, 132)",
-        "rgb(255, 159, 64)",
-        "rgb(255, 205, 86)",
-        "rgb(75, 192, 192)",
-        "rgb(54, 162, 235)",
-        "rgb(153, 102, 255)",
-        "rgb(201, 203, 207)",
-      ],
-    };
+    // 清除之前的圖表
+    if (chartConfigs[index] && chartConfigs[index].chart) {
+      chartConfigs[index].chart.destroy();
+    }
 
-    chartConfigs.push(chartConfig);
-    createChart(chartConfig);
+    if (item.selection_type === "radio" || item.selection_type === "checkbox") {
+      const labels = item.selection.map((sele) => sele);
+
+      const chartConfigBar = {
+        type: "bar",
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              label: "填寫人數",
+              data: [8, 14, 20, 12],
+              backgroundColor: [
+                "rgba(255, 99, 132, 0.2)",
+                "rgba(255, 159, 64, 0.2)",
+                "rgba(255, 205, 86, 0.2)",
+                "rgba(75, 192, 192, 0.2)",
+                "rgba(54, 162, 235, 0.2)",
+                "rgba(153, 102, 255, 0.2)",
+                "rgba(201, 203, 207, 0.2)",
+              ],
+              borderColor: [
+                "rgb(255, 99, 132)",
+                "rgb(255, 159, 64)",
+                "rgb(255, 205, 86)",
+                "rgb(75, 192, 192)",
+                "rgb(54, 162, 235)",
+                "rgb(153, 102, 255)",
+                "rgb(201, 203, 207)",
+              ],
+              borderWidth: 1, //加入邊界寬度，如果有邊界，透明度改回.2
+            },
+          ],
+        },
+      };
+
+      const chartConfigPie = {
+        type: "pie",
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              label: "這是標題",
+              data: [8, 14, 20, 12],
+              backgroundColor: [
+                "rgba(255, 99, 132, 0.2)",
+                "rgba(255, 159, 64, 0.2)",
+                "rgba(255, 205, 86, 0.2)",
+                "rgba(75, 192, 192, 0.2)",
+                "rgba(54, 162, 235, 0.2)",
+                "rgba(153, 102, 255, 0.2)",
+                "rgba(201, 203, 207, 0.2)",
+              ],
+              borderColor: [
+                "rgb(255, 99, 132)",
+                "rgb(255, 159, 64)",
+                "rgb(255, 205, 86)",
+                "rgb(75, 192, 192)",
+                "rgb(54, 162, 235)",
+                "rgb(153, 102, 255)",
+                "rgb(201, 203, 207)",
+              ],
+              borderWidth: 1,
+            },
+          ],
+        },
+      };
+
+      // 創建data圖表
+      const chart = new Chart(ctx, chartConfigBar);
+      chartConfigs[index] = { chart, type: "bar", config: chartConfigBar };
+      const chart2 = new Chart(ctx2, chartConfigPie);
+      chartConfigs[index] = {
+        chart2,
+        type: "pie",
+        config: chartConfigPie,
+      };
+    }
+
+    if (item.selection_type === "textarea") {
+      //處理文字方塊data
+
+      const textInputLabels = [];
+      AllData.ansData.userinfos.forEach((userInfo) => {
+        const ans = userInfo.ans;
+        ans.forEach((answer) => {
+          textInputLabels.push(answer);
+        });
+      });
+
+      console.log("答案陣列(labels):", textInputLabels);
+    }
   });
 });
-
-//利用取得的資料作出相應的data
 </script>
 
 <template>
   <h1>資料</h1>
   <!-- 測試區域 -->
-  {{ AllData }}
+  <!-- {{ AllData }} -->
   <div class="test" v-for="item in AllData.quizData.question">
     <p>{{ item }}</p>
     <!-- <p>///問卷資料:///{{ item.selection }}</p> -->
@@ -254,7 +295,28 @@ onBeforeMount(async () => {
 
       <!-- 數據圖表 -->
       <div class="dataChart">
-        <canvas :id="'myChart' + index"></canvas>
+        <div class="chooseType">
+          <input
+            type="radio"
+            :name="'chartType' + index"
+            v-model="chartTypes[index]"
+            value="bar"
+          />
+          <label for="">長條圖</label>
+          <input
+            type="radio"
+            :name="'chartType' + index"
+            v-model="chartTypes[index]"
+            value="pie"
+          />
+          <label for="">圓餅圖</label>
+        </div>
+        <div class="barChart" v-show="chartTypes[index] == 'bar'">
+          <canvas :id="'myChart' + index"></canvas>
+        </div>
+        <div class="pieChart" v-show="chartTypes[index] == 'pie'">
+          <canvas :id="'myChart2' + index"></canvas>
+        </div>
       </div>
       <!-- 數據圖表 -->
     </div>
@@ -418,10 +480,36 @@ button {
     }
 
     .dataChart {
-      border: 1px solid red;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
       width: 50vw;
       min-height: 40vh;
       margin-bottom: 1rem;
+
+      .chooseType {
+        width: 20vw;
+        display: flex;
+        justify-content: space-around;
+
+        input {
+          margin-right: 0.5rem;
+          transform: scale(1.5);
+        }
+
+        label {
+          font-size: 1.2rem;
+          color: #1e5128;
+        }
+      }
+
+      .barChart {
+        width: 50vw;
+      }
+
+      .pieChart {
+        width: 30vw;
+      }
     }
   }
   .apiBtn {

@@ -45,6 +45,13 @@ readDate 匯入題目跟userinfo API
 ☆處理物件(object資料)要使用toRefs去接收才能使其為響應式資料☆
 ☆☆☆資料庫的時間和JS內的時間不同步，之後處理時間日期相關資料要先確認日期資料型態☆☆☆
 
+11/28
+readdata 圖表比我想像的還難用
+還要區分單選複選||文字方塊的X軸資料不同 
+(單選複選:X放quizdata內的selection)
+(文字:X放ansdata內的ans)
+Y軸都是放計算回答的次數
+
  create、edit bug
  ※不輸入日期不會顯示提是錯誤訊息
  ※開始日期 = 結束日期，不會抱錯，儲存狀態->尚未開始
@@ -55,10 +62,21 @@ readDate 匯入題目跟userinfo API
  ※無法連接answer/create API state:415 (11/27 date_time資料型態錯誤)
  ※radio名稱相同的時候會同時選取相同名稱選項
 
-
  search_backend 
  ※歷史紀錄search要抓結束日期<date.now (state => 空開中->已結束)
  ※歷史紀錄search要抓 開始日期 == date.now (state 從未公開->空開中)
  ※紀錄要從最新的到舊的(orderById desc)  11/26完成
 
+☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆
+ chartjs參數意思:
+ctx: 2D 繪圖環境，即指定圖表要渲染在哪個 <canvas> 上。
+
+type: 圖表的類型，它指定了你希望創建的圖表類型，例如 "bar"（條形圖）、"line"（線性圖）等。
+
+data: 包含圖表數據的對象，它定義了圖表中的標籤、數據集等。
+labels 是 X 軸上的標籤數組，datasets 是一個包含數據集的數組。
+每個數據集包含 label（數據集的標籤）、data（數據數組）、fill（是否填充區域）、backgroundColor（區域填充的顏色）、borderColor（邊框顏色）、tension（線條的張力）等屬性。
+
+options（可選）: 包含圖表配置選項的對象。這個參數允許你配置圖表的外觀和行為，例如標籤、軸、圖例等。
+☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆
  

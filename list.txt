@@ -52,6 +52,13 @@ readdata 圖表比我想像的還難用
 (文字:X放ansdata內的ans)
 Y軸都是放計算回答的次數
 
+11/29
+Y軸data:回答資料設定
+製作一個object{}，key是question的selection(文字方塊的X軸要用userinfo的ans)，
+value是每個選項的做答次數
+然後要按照問題分成不同的object
+EX:{#1:{A:2 ,B:5, C:3, D:0},#2{牛肉:3, 雞肉:5, 豬肉:2, 羊肉:5}} 
+
  create、edit bug
  ※不輸入日期不會顯示提是錯誤訊息
  ※開始日期 = 結束日期，不會抱錯，儲存狀態->尚未開始

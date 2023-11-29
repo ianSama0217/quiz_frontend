@@ -83,6 +83,9 @@ onBeforeMount(async () => {
   }
 
   //依照問題類型製作統計圖表(單、複選 || 文字方塊)
+  //儲存使用者做答紀錄
+  let ansCounts = {};
+
   //儲存dataChart陣列
   let chartConfigs = [];
 
@@ -92,6 +95,46 @@ onBeforeMount(async () => {
   AllData.quizData.question.forEach((item, index) => {
     const ctx = document.getElementById("myChart" + index);
     const ctx2 = document.getElementById("myChart2" + index);
+
+    //統計前先初始化ansCounts
+    ansCounts[item.id] = {};
+
+    // 將選項初始化為 0
+    item.selection.forEach((sele) => {
+      ansCounts[item.id][sele] = 0;
+      console.log(ansCounts[item.id][sele]);
+    });
+
+    //取得每個使用者填寫紀錄
+    AllData.ansData.userinfos.forEach((userData) => {
+      // 在每筆作答紀錄前初始化 ansCounts
+      ansCounts[item.id] = {};
+      //選項初始化(全部為0)
+      item.selection.forEach((sele) => {
+        ansCounts[item.id][sele] = 0;
+      });
+      //取得每筆作答紀錄
+      userData.ans.forEach((userAns) => {
+        //判斷是否為複選
+        if (Array.isArray(userAns)) {
+          //複選 -> 再foreach
+          userAns.forEach((checkboxAns) => {
+            ansCounts[checkboxAns] = ansCounts[checkboxAns] + 1 || 1;
+          });
+        } else {
+          //單選or問答
+          ansCounts[userAns] = ansCounts[userAns] + 1 || 1;
+        }
+      });
+    });
+    // for (let e in ansCounts) {
+    //   e = e - 1 / 2;
+    // }
+    console.log(ansCounts);
+
+    item.selection.forEach((sele, index) => {
+      ansCounts[sele] = (ansCounts[sele] || 0) + 1;
+    });
 
     // 清除之前的圖表
     if (chartConfigs[index] && chartConfigs[index].chart) {
@@ -108,7 +151,7 @@ onBeforeMount(async () => {
           datasets: [
             {
               label: "填寫人數",
-              data: [8, 14, 20, 12],
+              data: Object.values(ansCounts), // 每個選項對應的回答次數
               backgroundColor: [
                 "rgba(255, 99, 132, 0.2)",
                 "rgba(255, 159, 64, 0.2)",
@@ -127,7 +170,7 @@ onBeforeMount(async () => {
                 "rgb(153, 102, 255)",
                 "rgb(201, 203, 207)",
               ],
-              borderWidth: 1, //加入邊界寬度，如果有邊界，透明度改回.2
+              borderWidth: 1,
             },
           ],
         },
@@ -140,7 +183,7 @@ onBeforeMount(async () => {
           datasets: [
             {
               label: "這是標題",
-              data: [8, 14, 20, 12],
+              data: Object.values(ansCounts),
               backgroundColor: [
                 "rgba(255, 99, 132, 0.2)",
                 "rgba(255, 159, 64, 0.2)",
@@ -322,7 +365,6 @@ onBeforeMount(async () => {
     </div>
 
     <div class="apiBtn">
-      <button type="button" @click="">下載PDF</button>
       <button type="button" @click="turnToSearchView()">確認</button>
     </div>
   </div>

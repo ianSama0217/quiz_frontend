@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onBeforeMount, watch, toRefs, reactive } from "vue";
+import { ref, onBeforeMount, toRefs, reactive } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { storeToRefs } from "pinia";
 /* api */
@@ -180,7 +180,7 @@ onBeforeMount(async () => {
           datasets: [
             {
               label: "這是標題",
-              data: ansCounts[index].values,
+              data: Object.values(ansCounts[index].values),
               backgroundColor: [
                 "rgba(255, 99, 132, 0.2)",
                 "rgba(255, 159, 64, 0.2)",
@@ -224,9 +224,9 @@ onBeforeMount(async () => {
   <!-- <div class="test" v-for="item in AllData.quizData.question">
     <p>{{ item }}</p>
   </div> -->
-  <div class="test" v-for="item in AllData.ansData.userinfos">
+  <!-- <div class="test" v-for="item in AllData.ansData.userinfos">
     <p>{{ item }}</p>
-  </div>
+  </div> -->
   <!-- 測試區域 -->
   <div class="body">
     <div class="questionTitle">

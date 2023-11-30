@@ -18,7 +18,7 @@ import { RouterLink, RouterView } from "vue-router";
       <i class="fa-solid fa-language icon"></i>
 
       <RouterLink to="/search_backend" class="backendLink">
-        歷史紀錄
+        後台管理
       </RouterLink>
 
       <i class="fa-solid fa-gear icon"></i>

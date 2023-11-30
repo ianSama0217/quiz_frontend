@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onBeforeMount, watch } from "vue";
+import { ref, onBeforeMount } from "vue";
 import api from "../api/index.js";
 /* 匯入組件 */
 import resList from "../components/search/resList.vue";
@@ -47,12 +47,6 @@ onBeforeMount(() => {
       <resList :getValue="getQuizValues" />
     </div>
     <!-- 顯示搜尋問卷列表 -->
-
-    <!-- 切換頁面 -->
-    <div class="changePage">
-      <changePageBtn @pageItem="handleChangePage" :quizLength="getQuizValues" />
-    </div>
-    <!-- 切換頁面 -->
   </div>
 
   <!-- 測試區域 -->
@@ -118,11 +112,6 @@ onBeforeMount(() => {
 
   .resList {
     min-height: 60vh;
-  }
-
-  .changePage {
-    position: sticky;
-    bottom: 5%;
   }
 }
 </style>

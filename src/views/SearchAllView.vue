@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onBeforeMount, watch } from "vue";
+import { ref, onBeforeMount } from "vue";
 import { storeToRefs } from "pinia";
 /* api*/
 import api from "../api/index.js";
@@ -21,8 +21,7 @@ const inputState = ref("");
 
 /*接收API資料*/
 const getQuizValues = ref([]);
-//依照當前頁面顯示的資料
-const displayList = ref([]);
+
 /*儲存指定問卷id*/
 const quizId = ref(0);
 
@@ -98,12 +97,6 @@ onBeforeMount(() => {
       />
     </div>
     <!-- 顯示搜尋問卷列表 -->
-
-    <!-- 切換頁面 -->
-    <div class="changePage">
-      <changePageBtn @pageItem="handleChangePage" :quizLength="getQuizValues" />
-    </div>
-    <!-- 切換頁面 -->
 
     <!-- 彈跳視窗 -->
     <div class="popDelete" v-if="isPopDelete">
@@ -191,11 +184,6 @@ onBeforeMount(() => {
 
   .publicList {
     min-height: 60vh;
-  }
-
-  .changePage {
-    position: sticky;
-    bottom: 5%;
   }
 }
 </style>

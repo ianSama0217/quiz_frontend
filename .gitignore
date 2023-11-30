@@ -26,3 +26,7 @@ coverage
 *.njsproj
 *.sln
 *.sw?
+
+#簡報
+動態問卷簡報.pdf
+動態問卷簡報.pptx

@@ -82,76 +82,73 @@ onBeforeMount(async () => {
     throw e;
   }
 
-  //依照問題類型製作統計圖表(單、複選 || 文字方塊)
   //儲存使用者做答紀錄
-  let ansCounts = {};
-
+  let ansCounts = {}; //keys = labels/ values = data
   //儲存dataChart陣列
-  let chartConfigs = [];
+  let chartConfigs = []; //儲存圖表
 
   // 在這裡設置 chartTypes 的初始值(長條圖)
   chartTypes.value = AllData.quizData.question.map(() => "bar");
 
-  AllData.quizData.question.forEach((item, index) => {
+  /* 依照問題類型製作統計圖表(單、複選 || 文字方塊) */
+  AllData.quizData.question.forEach((ques, index) => {
+    //初始化
+    ansCounts[index] = {};
+    //區隔選擇和文字方塊
+    if (ques.selection_type == "radio" || ques.selection_type == "checkbox") {
+      ansCounts[index].keys = ques.selection.map((sele) => sele);
+    } else {
+      AllData.ansData.userinfos.forEach((userAns) => {
+        //如果已經有key就停止迴圈
+        if (!ansCounts[index].keys) {
+          ansCounts[index].keys = [];
+          AllData.ansData.userinfos.forEach((userAns) => {
+            ansCounts[index].keys.push(...userAns.ans);
+          });
+        }
+      });
+    }
+
+    // 初始化 values
+    ansCounts[index].values = {};
+
+    // 統計做答次數
+    if (AllData.ansData.userinfos) {
+      AllData.ansData.userinfos.forEach((userAns) => {
+        userAns.ans.forEach((ans) => {
+          if (Array.isArray(ans)) {
+            // 處理陣列的情況（複選題）
+            ans.forEach((option) => {
+              if (ansCounts[index].keys.includes(option)) {
+                ansCounts[index].values[option] =
+                  (ansCounts[index].values[option] || 0) + 1;
+              }
+            });
+          } else {
+            // 單選或文字方塊的情況
+            if (ansCounts[index].keys.includes(ans)) {
+              ansCounts[index].values[ans] =
+                (ansCounts[index].values[ans] || 0) + 1;
+            }
+          }
+        });
+      });
+    }
+
+    /* 利用ansCounts資料畫出圖表 */
     const ctx = document.getElementById("myChart" + index);
     const ctx2 = document.getElementById("myChart2" + index);
 
-    //統計前先初始化ansCounts
-    ansCounts[item.id] = {};
-
-    // 將選項初始化為 0
-    item.selection.forEach((sele) => {
-      ansCounts[item.id][sele] = 0;
-      console.log(ansCounts[item.id][sele]);
-    });
-
-    //取得每個使用者填寫紀錄
-    AllData.ansData.userinfos.forEach((userData) => {
-      // 在每筆作答紀錄前初始化 ansCounts
-      ansCounts[item.id] = {};
-      //選項初始化(全部為0)
-      item.selection.forEach((sele) => {
-        ansCounts[item.id][sele] = 0;
-      });
-      //取得每筆作答紀錄
-      userData.ans.forEach((userAns) => {
-        //判斷是否為複選
-        if (Array.isArray(userAns)) {
-          //複選 -> 再foreach
-          userAns.forEach((checkboxAns) => {
-            ansCounts[checkboxAns] = ansCounts[checkboxAns] + 1 || 1;
-          });
-        } else {
-          //單選or問答
-          ansCounts[userAns] = ansCounts[userAns] + 1 || 1;
-        }
-      });
-    });
-    // for (let e in ansCounts) {
-    //   e = e - 1 / 2;
-    // }
-    console.log(ansCounts);
-
-    item.selection.forEach((sele, index) => {
-      ansCounts[sele] = (ansCounts[sele] || 0) + 1;
-    });
-
-    // 清除之前的圖表
-    if (chartConfigs[index] && chartConfigs[index].chart) {
-      chartConfigs[index].chart.destroy();
-    }
-
-    if (item.selection_type === "radio" || item.selection_type === "checkbox") {
-      const labels = item.selection.map((sele) => sele);
-
+    if (ques.selection_type === "radio" || ques.selection_type === "checkbox") {
+      //長條圖
       const chartConfigBar = {
         type: "bar",
         data: {
-          labels: labels,
+          labels: ansCounts[index].keys,
           datasets: [
             {
               label: "填寫人數",
-              data: Object.values(ansCounts), // 每個選項對應的回答次數
+              data: Object.values(ansCounts[index].values), // 每個選項對應的回答次數
               backgroundColor: [
                 "rgba(255, 99, 132, 0.2)",
                 "rgba(255, 159, 64, 0.2)",
@@ -175,15 +172,15 @@ onBeforeMount(async () => {
           ],
         },
       };
-
+      //圓餅圖
       const chartConfigPie = {
         type: "pie",
         data: {
-          labels: labels,
+          labels: ansCounts[index].keys,
           datasets: [
             {
               label: "這是標題",
-              data: Object.values(ansCounts),
+              data: Object.values(ansCounts[index].values),
               backgroundColor: [
                 "rgba(255, 99, 132, 0.2)",
                 "rgba(255, 159, 64, 0.2)",
@@ -210,45 +207,26 @@ onBeforeMount(async () => {
 
       // 創建data圖表
       const chart = new Chart(ctx, chartConfigBar);
-      chartConfigs[index] = { chart, type: "bar", config: chartConfigBar };
+      //將製作好的圖表加入陣列
+      chartConfigs.push({ chart, type: "bar", config: chartConfigBar });
       const chart2 = new Chart(ctx2, chartConfigPie);
-      chartConfigs[index] = {
-        chart2,
-        type: "pie",
-        config: chartConfigPie,
-      };
+      //將製作好的圖表加入陣列
+      chartConfigs.push({ chart2, type: "pie", config: chartConfigPie });
     }
-
-    if (item.selection_type === "textarea") {
-      //處理文字方塊data
-
-      const textInputLabels = [];
-      AllData.ansData.userinfos.forEach((userInfo) => {
-        const ans = userInfo.ans;
-        ans.forEach((answer) => {
-          textInputLabels.push(answer);
-        });
-      });
-
-      console.log("答案陣列(labels):", textInputLabels);
-    }
+    /* ^^^ 利用ansCounts資料畫出圖表 ^^^ */
   });
 });
 </script>
 
 <template>
-  <h1>資料</h1>
   <!-- 測試區域 -->
   <!-- {{ AllData }} -->
-  <div class="test" v-for="item in AllData.quizData.question">
+  <!-- <div class="test" v-for="item in AllData.quizData.question">
     <p>{{ item }}</p>
-    <!-- <p>///問卷資料:///{{ item.selection }}</p> -->
-  </div>
-
-  <div class="test" v-for="item in AllData.ansData.userinfos">
+  </div> -->
+  <!-- <div class="test" v-for="item in AllData.ansData.userinfos">
     <p>{{ item }}</p>
-    <!-- <p>///答案資料:///{{ item.ans }}</p> -->
-  </div>
+  </div> -->
   <!-- 測試區域 -->
   <div class="body">
     <div class="questionTitle">
@@ -338,7 +316,10 @@ onBeforeMount(async () => {
 
       <!-- 數據圖表 -->
       <div class="dataChart">
-        <div class="chooseType">
+        <div
+          class="chooseType"
+          v-show="AllData.quizData.question[index].selection_type != 'textarea'"
+        >
           <input
             type="radio"
             :name="'chartType' + index"

@@ -186,23 +186,30 @@ const postQuiz = () => {
   CreateReq.quiz.end_time = new Date(endDate);
 
   // 將日期轉換為日期字串（僅包含日期部分）
-  const startDateStr = new Date(CreateReq.quiz.start_time)
-    .toISOString()
-    .split("T")[0];
-  const currentDateTimeStr = currentDateTime.toISOString().split("T")[0];
-
-  if (CreateReq.quiz.start_time == null || CreateReq.quiz.end_time == null) {
+  if (!isNaN(CreateReq.quiz.start_time) && !isNaN(CreateReq.quiz.end_time)) {
+    const startDateStr = new Date(CreateReq.quiz.start_time)
+      .toISOString()
+      .split("T")[0];
+    const currentDateTimeStr = currentDateTime.toISOString().split("T")[0];
+    //判斷輸入日期邏輯
+    if (startDateStr < currentDateTimeStr) {
+      alert("發布日期不能小於今天");
+      data = false;
+    } else if (CreateReq.quiz.start_time > CreateReq.quiz.end_time) {
+      alert("發布日期不能大於結束日期");
+      data = false;
+    } else if (
+      CreateReq.quiz.start_time.getTime() == CreateReq.quiz.end_time.getTime()
+    ) {
+      alert("發布日期不能等於結束日期");
+      data = false;
+    }
+  } else {
     alert("請輸入日期");
     data = false;
-  } else if (startDateStr < currentDateTimeStr) {
-    alert("發布日期不能小於今天");
-    data = false;
-  } else if (CreateReq.quiz.start_time > CreateReq.quiz.end_time) {
-    alert("發布日期不能大於結束日期");
-    data = false;
   }
-  /* 用日期判斷state狀態 */
 
+  /* 用日期判斷state狀態 */
   if (CreateReq.quiz.start_time <= currentDateTime) {
     CreateReq.quiz.state = "發布中";
   }

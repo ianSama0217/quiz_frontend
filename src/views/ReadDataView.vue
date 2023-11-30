@@ -148,7 +148,7 @@ onBeforeMount(async () => {
           datasets: [
             {
               label: "填寫人數",
-              data: Object.values(ansCounts[index].values), // 每個選項對應的回答次數
+              data: ansCounts[index].values, // 每個選項對應的回答次數
               backgroundColor: [
                 "rgba(255, 99, 132, 0.2)",
                 "rgba(255, 159, 64, 0.2)",
@@ -180,7 +180,7 @@ onBeforeMount(async () => {
           datasets: [
             {
               label: "這是標題",
-              data: Object.values(ansCounts[index].values),
+              data: ansCounts[index].values,
               backgroundColor: [
                 "rgba(255, 99, 132, 0.2)",
                 "rgba(255, 159, 64, 0.2)",
@@ -224,9 +224,9 @@ onBeforeMount(async () => {
   <!-- <div class="test" v-for="item in AllData.quizData.question">
     <p>{{ item }}</p>
   </div> -->
-  <!-- <div class="test" v-for="item in AllData.ansData.userinfos">
+  <div class="test" v-for="item in AllData.ansData.userinfos">
     <p>{{ item }}</p>
-  </div> -->
+  </div>
   <!-- 測試區域 -->
   <div class="body">
     <div class="questionTitle">

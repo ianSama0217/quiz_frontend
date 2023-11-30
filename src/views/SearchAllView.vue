@@ -13,7 +13,7 @@ const displayStore = useDisplayStore();
 const { openDeletePop, closeDeletePop } = displayStore;
 const { isPopDelete } = storeToRefs(displayStore);
 
-const { getQuizBackend, deleteQuiz } = api;
+const { getQuizBackend, deleteQuiz, createQuiz } = api;
 
 /* 搜尋欄位 */
 const inputTitle = ref("");
@@ -28,6 +28,8 @@ const quizId = ref(0);
 const search = (inputTitle, inputState) => {
   getQuizBackend(inputTitle, inputState)
     .then((data) => {
+      /* 依日期判定state */
+
       getQuizValues.value = data;
     })
     .catch((e) => {
@@ -90,9 +92,11 @@ onBeforeMount(() => {
 
     <!-- 顯示搜尋問卷列表 -->
     <div class="publicList">
+      <span v-show="getQuizValues.length == 0"
+        >找不到查詢資料 請確認是否輸入正確</span
+      >
       <publicList
         :getValue="getQuizValues"
-        :limit10List="currentPage"
         @deleteQuizItem="handleDeleteQuiz"
       />
     </div>
@@ -184,6 +188,9 @@ onBeforeMount(() => {
 
   .publicList {
     min-height: 60vh;
+    span {
+      font-size: 1.4rem;
+    }
   }
 }
 </style>

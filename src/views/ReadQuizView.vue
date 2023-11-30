@@ -18,7 +18,7 @@ const turnToEditView = () => {
 /*載入頁面前先取得指定id，顯示全部資料*/
 onBeforeMount(() => {
   const quizId = useRoute().params.id;
-  console.log("編輯問卷id: " + quizId);
+  console.log("查看問卷id: " + quizId);
 
   //取得問卷資料
   getQuizInfo(quizId)

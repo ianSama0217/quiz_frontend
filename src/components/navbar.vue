@@ -75,11 +75,6 @@ $textColor: #1e5128;
     .icon {
       font-size: 2rem;
       color: $textColor;
-      transition: 0.5s ease;
-
-      &:hover {
-        cursor: pointer;
-      }
     }
 
     .backendLink {

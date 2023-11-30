@@ -44,6 +44,9 @@ onBeforeMount(() => {
 
     <!-- 顯示搜尋問卷列表 -->
     <div class="resList">
+      <span v-show="getQuizValues.length == 0"
+        >找不到查詢資料 請確認是否輸入正確</span
+      >
       <resList :getValue="getQuizValues" />
     </div>
     <!-- 顯示搜尋問卷列表 -->
@@ -111,7 +114,10 @@ onBeforeMount(() => {
   }
 
   .resList {
-    min-height: 60vh;
+    min-height: 70vh;
+    span {
+      font-size: 1.4rem;
+    }
   }
 }
 </style>

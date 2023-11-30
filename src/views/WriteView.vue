@@ -77,7 +77,6 @@ const setAnsReq = () => {
   let now = new Date();
   now.setHours(now.getHours() - 4);
   CreateAnsReq.userinfos[0].date_time = now;
-  console.log(CreateAnsReq.userinfos[0].date_time);
 };
 
 /* 導向首頁 */
@@ -95,6 +94,9 @@ const createAns = () => {
 /* 點擊確認按鈕，超多防呆 */
 const clickCreateBtn = () => {
   let data = true;
+  //手機、信箱檢查格式
+  const emailRegexp = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+  const phoneRegexp = /^(\+?886-?|0)?9\d{8}$/;
 
   if (data == true) {
     //沒有姓名 -> 不能發布
@@ -112,6 +114,12 @@ const clickCreateBtn = () => {
       data = false;
       return;
     }
+    if (!emailRegexp.test(CreateAnsReq.userinfos[0].email)) {
+      hintStr.value = "確認信箱格式是否正確";
+      openHintPop();
+      data = false;
+      return;
+    }
 
     //未輸入說明 -> 不能發布
     if (CreateAnsReq.userinfos[0].phone_number == "") {
@@ -120,10 +128,16 @@ const clickCreateBtn = () => {
       data = false;
       return;
     }
+    if (!phoneRegexp.test(CreateAnsReq.userinfos[0].phone_number)) {
+      hintStr.value = "確認手機號碼格式是否正確";
+      openHintPop();
+      data = false;
+      return;
+    }
 
     // 檢查選項是否都有填寫答案
     if (CreateAnsReq.userinfos[0].ans.length > 0) {
-      let allQuestionsAnswered = true; // 假設所有問題都有答案
+      let allQuestionsAnswered = true; // 所有問題必須填寫
 
       //判斷問題是否填寫
       CreateAnsReq.userinfos[0].ans.forEach((item, index) => {
@@ -158,13 +172,13 @@ const clickCreateBtn = () => {
       });
 
       if (allQuestionsAnswered) {
-        // 所有問題都有答案，繼續執行你的邏輯
+        // 所有問題都有答案，繼續執行
         openSentPop();
         createAns();
       }
     } else {
       // 如果沒有任何答案，顯示提示
-      hintStr.value = "至少需要回答一個問題";
+      hintStr.value = "至少要填寫一題";
       openHintPop();
       data = false;
     }

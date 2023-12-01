@@ -43,7 +43,21 @@ const getQuizInfo = (id) => {
     });
 };
 
-//取得問卷作答資訊
+//取得問卷作答資訊(依ansid取得單筆)
+const getUserAns = (id) => {
+  return axios
+    .get(`http://localhost:8080/quiz/get/user?id=${id}`)
+    .then((res) => {
+      const data = res.data;
+      console.log(data);
+      return data;
+    })
+    .catch((e) => {
+      throw e;
+    });
+};
+
+//取得問卷作答資訊(所有作答資訊)
 const getQuizAns = (id) => {
   return axios
     .get(`http://localhost:8080/quiz/get/answer?id=${id}`)
@@ -104,6 +118,7 @@ export default {
   getQuizFrontend,
   getQuizBackend,
   getQuizInfo,
+  getUserAns,
   getQuizAns,
   createQuiz,
   createQuizAns,

@@ -1,12 +1,22 @@
 <script setup>
 import { defineProps } from "vue";
+import { useRouter } from "vue-router";
 /* pinia */
 import { useDisplayStore } from "../../stores/popStore.js";
+
+const router = useRouter();
 
 const displayStore = useDisplayStore();
 const { closeDataPop } = displayStore;
 
 const props = defineProps(["userinfo"]);
+
+const turnToReadQuizAnsView = (data) => {
+  router.push({
+    name: "readquizAns",
+    params: { id: data.quiz_id, ansId: data.ansId, name: data.name },
+  });
+};
 </script>
 
 <template>
@@ -22,6 +32,7 @@ const props = defineProps(["userinfo"]);
             <th>信箱</th>
             <th>手機號碼</th>
             <th>填寫時間</th>
+            <th>填寫紀錄</th>
           </tr>
         </thead>
         <tbody v-for="item in userinfo.slice().reverse()">
@@ -31,6 +42,9 @@ const props = defineProps(["userinfo"]);
             <td>{{ item.email }}</td>
             <td>{{ item.phone_number }}</td>
             <td>{{ item.date_time.replace("T", " ") }}</td>
+            <td @click="turnToReadQuizAnsView(item)">
+              <span class="record">填寫紀錄</span>
+            </td>
           </tr>
         </tbody>
       </table>
@@ -106,7 +120,7 @@ const props = defineProps(["userinfo"]);
   max-height: 50vh;
   overflow-y: scroll;
   table {
-    min-width: 50vw;
+    min-width: 55vw;
     border-collapse: collapse;
 
     thead {
@@ -133,6 +147,16 @@ const props = defineProps(["userinfo"]);
         td {
           padding: 0.5rem;
           border: 1px solid #1e5128;
+        }
+
+        .record {
+          font-size: 1.1rem;
+          transition: 0.2s ease;
+
+          &:hover {
+            cursor: pointer;
+            border-bottom: 2px solid #1e5128;
+          }
         }
       }
     }

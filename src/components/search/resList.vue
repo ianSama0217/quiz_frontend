@@ -15,7 +15,8 @@ const turnToReadQuizView = (data) => {
 </script>
 
 <template>
-  <div class="resList" v-for="data in getValue">
+  <div class="resList" v-for="(data, index) in getValue">
+    <span>{{ index + 1 }}</span>
     <span class="title">{{ data.title }}</span>
     <span class="time">{{ data.start_time }} ~ {{ data.end_time }}</span>
 

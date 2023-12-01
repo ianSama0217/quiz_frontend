@@ -14,7 +14,7 @@ import Chart from "chart.js/auto";
 const router = useRouter();
 
 const displayStore = useDisplayStore();
-const { openDataPop } = displayStore;
+const { openDataPop, closeDataPop } = displayStore;
 const { isPopData } = storeToRefs(displayStore);
 
 const { getQuizInfo, getQuizAns } = api;
@@ -34,6 +34,9 @@ const turnToSearchView = () => {
 
 /*載入頁面前先取得指定id，顯示全部資料*/
 onBeforeMount(async () => {
+  //關閉個人資訊彈跳視窗
+  closeDataPop();
+
   const quizId = useRoute().params.id;
   console.log("查看數據問卷id: " + quizId);
 
